@@ -63,7 +63,7 @@ First:
 Then inside a file called example.i.js:
 
     // Hoist the DSL into the global namespace:
-    require('./lib/inductive.js').globals()
+    require('inductive.js').globals()
 
     // Specify our program:
     var helloWorld =
