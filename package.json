@@ -1,0 +1,66 @@
+{
+  "name": "inductive.js",
+  "version": "0.0.0",
+  "description": "Inductive programming for JavaScript",
+  "main": "./lib/inductive.js",
+  "scripts": {
+    "test": "node ./test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omphalos/inductive.js"
+  },
+  "keywords": [
+    "type",
+    "types",
+    "ast",
+    "abstract-syntax-tree",
+    "abstract",
+    "syntax",
+    "tree"
+    "induction",
+    "inductive",
+    "inductive-programming",
+    "inductive-functional-programming",
+    "test",
+    "testing",
+    "unit",
+    "mock",
+    "solver",
+    "solve",
+    "mocks",
+    "mocking",
+    "tests",
+    "programming",
+    "spec",
+    "specification",
+    "tdd",
+    "test-driven",
+    "test-driven-development",
+    "bdd",
+    "behavior-driven-development",
+    "behavior-driven",
+    "behavior",
+    "ui-testing",
+    "ui",
+    "io",
+    "functional",
+    "functional-programming",
+    "fp",
+    "immutable",
+    "immutability",
+    "curry-howard-isomorphism",
+    "curry",
+    "howard",
+    "isomorphism",
+    "proof",
+    "proves",
+    "proofs"
+  ],
+  "author": "omphalos",
+  "license": "MIT",
+  "dependencies": {
+    "escodegen": "~1.3.1",
+    "esprima": "~1.1.1"
+  }
+}

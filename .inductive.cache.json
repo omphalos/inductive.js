@@ -1,0 +1,9 @@
+{
+  "/Users/erik/inductive.js/example.i.js": {
+    "helloWorld": [
+      "helloWorld : () -> undefined takes (undefined)",
+      "⌞ console.log : undefined takes ('a)",
+      "  ⌞ \"hello world\" : String"
+    ]
+  }
+}
