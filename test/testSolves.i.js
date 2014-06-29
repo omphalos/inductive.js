@@ -1,7 +1,7 @@
 var inductive = require('../lib/inductive.js')
   , fileOptions = inductive.fileOptions
   , type = inductive.type
-  , generic = inductive.generic
+  , typeParameter = inductive.typeParameter
   , tap = inductive.tap
   , takes = inductive.takes
   , forConstructor = inductive.forConstructor
@@ -568,12 +568,12 @@ specify('throwNot',
     as('not throw 555')),
   use('throw', value('123')))
 
-// Generic functions
+// TypeParameter functions
 specify('genericFn',
-  takes(generic('a')),
+  takes(typeParameter('a')),
   returns(recordType(
-    takes(generic('a'), 'lhs'),
-    takes(generic('a'), 'rhs'))),
+    takes(typeParameter('a'), 'lhs'),
+    takes(typeParameter('a'), 'rhs'))),
   given(1, shouldReturn({ lhs: 1, rhs: 1 })),
   use(objectCreates()))
 

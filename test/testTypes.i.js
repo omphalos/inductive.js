@@ -5,19 +5,19 @@ var inductive = require('../lib/inductive.js')
   , takes = inductive.takes
   , returns = inductive.returns
   , argumentsType = inductive.argumentsType
-  , templateType = inductive.templateType
+  , parameterizedType = inductive.parameterizedType
   , mapType = inductive.mapType
   , arrayType = inductive.arrayType
   , nullType = inductive.nullType
   , undefinedType = inductive.undefinedType
   , forConstructor = inductive.forConstructor
   , type = inductive.type
-  , generic = inductive.generic
+  , typeParameter = inductive.typeParameter
   , recordType = inductive.recordType
   , unionType = inductive.unionType
 
 /////////////////////////////////
-// Test generic subset checks. //
+// Test typeParameter subset checks. //
 /////////////////////////////////
 
 var a = type('A')
@@ -28,15 +28,15 @@ a.habitationTemplate = 'a'
 b.habitationTemplate = 'b'
 c.habitationTemplate = 'c'
 
-var ga = generic('a')
-  , gb = generic('b')
-  , gc = generic('c')
-  , gd = generic('d')
-  , ge = generic('e')
-  , gf = generic('f')
+var ga = typeParameter('a')
+  , gb = typeParameter('b')
+  , gc = typeParameter('c')
+  , gd = typeParameter('d')
+  , ge = typeParameter('e')
+  , gf = typeParameter('f')
   , genericTree = recordType()
   , numberTree = recordType()
-genericTree.takes(generic('a'), 'value')
+genericTree.takes(typeParameter('a'), 'value')
 genericTree.takes(unionType(genericTree, null), 'lhs')
 genericTree.takes(unionType(genericTree, null), 'rhs')
 numberTree.takes(Number, 'value')
@@ -75,11 +75,11 @@ testTypeContains(false, unionType(a, b), unionType(a, c))
 testTypeContains(false, unionType(a, b), unionType(a, b, c))
 testTypeContains(false, unionType(a, b), argumentsType(a, b))
 testTypeContains(false, argumentsType(a, b), unionType(a, b))
-testTypeContains(true, templateType(ga, 'a'), templateType(ga, 'a'))
+testTypeContains(true, parameterizedType(ga, 'a'), parameterizedType(ga, 'a'))
 testTypeContains(false,
-  templateType(ga, 'a'),
-  templateType(ga, gb, 'a'))
-testTypeContains(false, templateType(ga, 'a'), templateType(ga, 'b'))
+  parameterizedType(ga, 'a'),
+  parameterizedType(ga, gb, 'a'))
+testTypeContains(false, parameterizedType(ga, 'a'), parameterizedType(ga, 'b'))
 testTypeContains(true,
   argumentsType(ga, gb, gc),
   argumentsType(gd, ge, gf))
@@ -102,12 +102,12 @@ testTypeContains(false,
   argumentsType(ga, gb, gb),
   argumentsType(ga, ga, gb))
 testTypeContains(true,
-  argumentsType(generic('a'), generic('a'), generic('b')),
-  argumentsType(generic('a'), generic('a'), generic('c')))
+  argumentsType(typeParameter('a'), typeParameter('a'), typeParameter('b')),
+  argumentsType(typeParameter('a'), typeParameter('a'), typeParameter('c')))
 testTypeContains(false,
-  argumentsType(generic('a'), generic('b'), generic('b')),
-  argumentsType(generic('a'), generic('a'), generic('b')))
-testTypeContains(true, templateType(gb, 'a'), templateType(c, 'a'))
+  argumentsType(typeParameter('a'), typeParameter('b'), typeParameter('b')),
+  argumentsType(typeParameter('a'), typeParameter('a'), typeParameter('b')))
+testTypeContains(true, parameterizedType(gb, 'a'), parameterizedType(c, 'a'))
 testTypeContains(true,
   recordType(takes(Number, 'a')),
   recordType(takes(Number, 'a')))
@@ -162,16 +162,16 @@ var testUnionContains = function(expected, genericUnion, typeFilters) {
 }
 
 testUnionContains(
-  unionType(Number, generic('a')),
-  unionType(Number, generic('a')), {})
+  unionType(Number, typeParameter('a')),
+  unionType(Number, typeParameter('a')), {})
 testUnionContains(unionType(undefinedType, Number, String),
-  unionType(undefinedType, generic('a')),
+  unionType(undefinedType, typeParameter('a')),
   { a: unionType(Number, String) })
 testUnionContains(unionType(undefinedType, String),
-  unionType(undefinedType, generic('a')),
+  unionType(undefinedType, typeParameter('a')),
   { a: unionType(undefinedType, String) })
 testUnionContains(undefinedType,
-  unionType(undefinedType, generic('a')),
+  unionType(undefinedType, typeParameter('a')),
   { a: undefinedType })
 
 ////////////////////////
