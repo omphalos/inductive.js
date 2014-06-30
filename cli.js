@@ -15,4 +15,4 @@ argv.forEach(function(a) {
   require(a)
 })
 
-inductive.save(function(err) { if(err) throw er })
+inductive.saveAll(function(err) { if(err) throw er })

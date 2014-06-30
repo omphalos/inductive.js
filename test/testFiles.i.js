@@ -4,7 +4,7 @@ var fs = require('fs')
   , ctorUtil = require('../lib/ctorUtil.js')
   , tap = require('../lib/tap.js')
   , inductive = require('../lib/inductive.js')
-  , save = inductive.save
+  , saveAll = inductive.saveAll
 
 deleteFileSync(__dirname + '/.inductive.cache.json')
 testFileGeneration(false, function() {
@@ -40,7 +40,7 @@ function testFileGeneration(cached, cont) {
   // Generate files.
   require('./project-actual/main.i.js')
 
-  save(function() {
+  saveAll(function() {
     // Validate the files.
     files.forEach(function(f) {
       f += '.js'

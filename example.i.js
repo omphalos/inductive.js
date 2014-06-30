@@ -1,8 +1,8 @@
-// Hoist the DSL into the global namespace:
+// Load the DSL:
 require('./lib/inductive.js').globals()
 
 // Specify our program:
-var helloWorld =
+run(
   specify('helloWorld',
     givenNoArgs(
       mock('console.log',
@@ -11,7 +11,5 @@ var helloWorld =
       'console.log',
       value('hello world'))))
 
-run(helloWorld)
-
 // Generate the .js file:
-save()
+saveAll()
