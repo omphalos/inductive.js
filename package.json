@@ -1,6 +1,6 @@
 {
   "name": "inductive.js",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Inductive programming for JavaScript",
   "main": "./lib/inductive.js",
   "scripts": {
