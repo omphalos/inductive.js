@@ -114,13 +114,13 @@
       "    ⌞ arg1 : (String | Number)",
       "    ⌞ String+ : String takes (String, String)",
       "      ⌞ refinement2 : String",
-      "      ⌞ refinement3 : String",
-      "    ⌞ refinement3 : Number",
+      "      ⌞ refinement7 : String",
+      "    ⌞ refinement7 : Number",
       "  ⌞ match : (String | Number) takes ((String | Number), (String | Number), (String | Number)) #arg1",
       "    ⌞ arg1 : (String | Number)",
-      "    ⌞ refinement3 : String",
+      "    ⌞ refinement7 : String",
       "    ⌞ Number+ : Number takes (Number, Number)",
-      "      ⌞ refinement3 : Number",
+      "      ⌞ refinement7 : Number",
       "      ⌞ refinement2 : Number"
     ],
     "pair": [
