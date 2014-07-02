@@ -43,7 +43,7 @@ numberTree.takes(Number, 'value')
 numberTree.takes(unionType(numberTree, null), 'lhs')
 numberTree.takes(unionType(numberTree, null), 'rhs')
 
-var testTypeContains = function(expect, x, y) {
+function testTypeContains(expect, x, y) {
   var recs = {}
   x = typeUtil.resolveType(x, {})
   y = typeUtil.resolveType(y, {})
@@ -51,7 +51,7 @@ var testTypeContains = function(expect, x, y) {
   tap.log(
     !!expect === !!matches,
     x.toString(),
-    expect ? '==' : '!=', 
+    expect ? '>=' : '>/=', 
     y.toString())
 }
 
@@ -127,12 +127,13 @@ testTypeContains(true,
   mapType.of(Number))
 testTypeContains(true, mapType, mapType.of(Number))
 testTypeContains(true, arrayType, arrayType.of(Number))
+testTypeContains(true, ga, arrayType)
 
 //////////////////////////////////////////
 // Test unions containing other unions. //
 //////////////////////////////////////////
 
-var testUnionContains = function(expected, genericUnion, typeFilters) {
+function testUnionContains(expected, genericUnion, typeFilters) {
   expected = typeUtil.resolveType(expected, {})
   genericUnion = typeUtil.resolveType(genericUnion, {})
   Object.keys(typeFilters).forEach(function(key) {
@@ -178,7 +179,7 @@ testUnionContains(undefinedType,
 // Test adding types. //
 ////////////////////////
 
-var testUnion = function() {
+function testUnion() {
 
   function resolve(x) { return typeUtil.resolveType(x, {}) }
 
@@ -217,7 +218,7 @@ testUnion(unionType(Number, Boolean),
   unionType(Number, Boolean),
   unionType(Number, Boolean))
 
-var disallowUnion = function(lhs, rhs) {
+function disallowUnion(lhs, rhs) {
   var recs = {}
   lhs = typeUtil.resolveType(lhs, recs)
   rhs = typeUtil.resolveType(rhs, recs)

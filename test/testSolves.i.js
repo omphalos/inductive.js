@@ -577,6 +577,14 @@ specify('genericFn',
   given(1, shouldReturn({ lhs: 1, rhs: 1 })),
   use(objectCreates()))
 
+specify('conditionalSlice',
+  takes(Array),
+  takes(Boolean),
+  returns(Array),
+  given([1, 2, 3], true, shouldReturn([1, 2, 3])),
+  given([1, 2, 3], false, shouldReturn([])),
+  use('?:', value([])))
+
 specify('mockConsoleLog',
   givenNoArgs(
     shouldReturn(),
