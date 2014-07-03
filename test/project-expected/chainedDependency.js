@@ -3,7 +3,7 @@ function subtract(arg0, arg1) {
 }
 
 function calcHundred() {
-  return subtract.call(null, 150, 50);
+  return subtract(150, 50);
 }
 
 var hundred = calcHundred();

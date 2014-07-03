@@ -6,11 +6,11 @@ function sum(arg0, arg1) {
 }
 
 function subtract5(arg0) {
-  return subtract.call(null, arg0, 5);
+  return subtract(arg0, 5);
 }
 
 function ninetyFive() {
-  return subtract5.call(null, hundred);
+  return subtract5(hundred);
 }
 
 var hundredAlias = hundred;

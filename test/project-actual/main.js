@@ -14,11 +14,11 @@ function getX() {
 }
 
 function squareRootSum(arg0, arg1) {
-  return Math.sqrt(sum.call(null, arg1, arg0));
+  return Math.sqrt(sum(arg1, arg0));
 }
 
 function squareXMinus5(arg0) {
-  return subtract5.call(null, arg0) * subtract5.call(null, arg0);
+  return subtract5(arg0) * subtract5(arg0);
 }
 
 function nativeSubtracter(arg0, arg1) {

@@ -32,7 +32,7 @@ function callNativeSubtract(arg0, arg1) {
 }
 
 function moduloMinusOne(arg0, arg1) {
-  return modulo.call(null, arg0, arg1 - 1);
+  return modulo(arg0, arg1 - 1);
 }
 
 module.exports = x;
