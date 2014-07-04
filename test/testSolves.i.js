@@ -1104,6 +1104,12 @@ specify('recordCompat3',
   use(recordCompat1, value('x')))
 */
 
+specify('argumentsAsArray',
+  returns(Array),
+  given((function() { return arguments })(1, 2, 3),
+    shouldReturn([1, 2])),
+  use('Array.slice2', 'Array.fromArguments', values(0, 2)))
+
 specify('hypotenuse',
   given(3,  4, shouldReturn(5)),
   given(5, 12, shouldReturn(13)),

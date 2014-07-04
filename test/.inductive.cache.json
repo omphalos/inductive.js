@@ -903,6 +903,14 @@
       "recordCompat2 : () -> { Object a: Number } takes ({ Object a: Number })",
       "⌞ recordCompat1.call : { Object a: Number }"
     ],
+    "argumentsAsArray": [
+      "argumentsAsArray : Arguments<Number> -> Array<'a> takes (Array<'a>)",
+      "⌞ Array.slice2 : Array<'a> takes (Array<'a>, Number, Number)",
+      "  ⌞ Array.fromArguments : Array<#> takes (Arguments<'a>)",
+      "    ⌞ arg0 : Arguments<Number>",
+      "  ⌞ 0 : Number",
+      "  ⌞ 2 : Number"
+    ],
     "hypotenuse": [
       "hypotenuse : (Number, Number) -> Number takes (Number)",
       "⌞ Math.sqrt : Number takes (Number)",
