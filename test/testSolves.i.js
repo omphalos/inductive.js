@@ -141,7 +141,7 @@ specify('returnUnion',
   given(1, shouldReturn(1)),
   given('str', shouldReturn('str')))
 
-specify('add',
+specify('getArraylength',
   given([1, 'two', 3, 'four'], shouldReturn(4)),
   use('Array.length'))
 

@@ -68,8 +68,8 @@
       "returnUnion : (String | Number) -> (String | Number) takes ((String | Number))",
       "⌞ arg0 : (String | Number)"
     ],
-    "add": [
-      "add : Array<(String | Number)> -> Number takes (Number)",
+    "getArraylength": [
+      "getArraylength : Array<(String | Number)> -> Number takes (Number)",
       "⌞ Array.length : Number takes (Array<'a>)",
       "  ⌞ arg0 : Array<(String | Number)>"
     ],
