@@ -1,0 +1,28 @@
+{
+  "/Users/erik/inductive.js/examples/underscore/underscore-i.i.js": {
+    "getElement0": [
+      "getElement0 : Array<'a> -> 'a takes ('a)",
+      "⌞ Array.element : ('a | undefined) takes (Array<'a>, Number)",
+      "  ⌞ arg0 : Array<#a>",
+      "  ⌞ 0 : Number"
+    ],
+    "sliceUpTo": [
+      "sliceUpTo : (Array<'a>, Number) -> Array<'a> takes (Array<'a>)",
+      "⌞ Array.slice2 : Array<'a> takes (Array<'a>, Number, Number)",
+      "  ⌞ arg0 : Array<#a>",
+      "  ⌞ 0 : Number",
+      "  ⌞ arg1 : Number"
+    ],
+    "safeSliceUpTo": [
+      "safeSliceUpTo : (Array<'a>, Number) -> Array<'a> takes (Array<'a>)",
+      "⌞ sliceUpTo.call : Array<'a> takes (Array<'a>, Number)",
+      "  ⌞ arg0 : Array<#a>",
+      "  ⌞ ?: : Number takes (Boolean, Number, Number)",
+      "    ⌞ Number< : Boolean takes (Number, Number)",
+      "      ⌞ arg1 : Number",
+      "      ⌞ 0 : Number",
+      "    ⌞ 0 : Number",
+      "    ⌞ arg1 : Number"
+    ]
+  }
+}
