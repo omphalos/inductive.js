@@ -1,3 +1,5 @@
+'use strict'
+
 var inductive = require('../lib/inductive.js')
   , typeUtil = require('../lib/types/typeUtil.js')
   , tap = inductive.tap
@@ -28,12 +30,12 @@ a.habitationTemplate = 'a'
 b.habitationTemplate = 'b'
 c.habitationTemplate = 'c'
 
-var ga = typeParameter('a')
-  , gb = typeParameter('b')
-  , gc = typeParameter('c')
-  , gd = typeParameter('d')
-  , ge = typeParameter('e')
-  , gf = typeParameter('f')
+var pa = typeParameter('a')
+  , pb = typeParameter('b')
+  , pc = typeParameter('c')
+  , pd = typeParameter('d')
+  , pe = typeParameter('e')
+  , pf = typeParameter('f')
   , genericTree = recordType()
   , numberTree = recordType()
 genericTree.takes(typeParameter('a'), 'value')
@@ -55,11 +57,11 @@ function testTypeContains(expect, x, y) {
     y.toString())
 }
 
-testTypeContains(true, ga, a)
-testTypeContains(false, a, ga)
+testTypeContains(true, pa, a)
+testTypeContains(false, a, pa)
 testTypeContains(true, a, a)
 testTypeContains(false, a, b)
-testTypeContains(true, ga, gb)
+testTypeContains(true, pa, pb)
 testTypeContains(true,
   functionType(takes(a), returns(b)),
   functionType(takes(a), returns(b)))
@@ -69,45 +71,45 @@ testTypeContains(false,
 testTypeContains(true, argumentsType(a, b), argumentsType(a, b))
 testTypeContains(false, argumentsType(a, b), argumentsType(a, c))
 testTypeContains(false, argumentsType(a, b), argumentsType(a, b, b))
-testTypeContains(true, argumentsType(ga, gb), argumentsType(gc, gc))
+testTypeContains(true, argumentsType(pa, pb), argumentsType(pc, pc))
 testTypeContains(true, unionType(a, b), unionType(a, b))
 testTypeContains(false, unionType(a, b), unionType(a, c))
 testTypeContains(false, unionType(a, b), unionType(a, b, c))
 testTypeContains(false, unionType(a, b), argumentsType(a, b))
 testTypeContains(false, argumentsType(a, b), unionType(a, b))
-testTypeContains(true, parameterizedType(ga, 'a'), parameterizedType(ga, 'a'))
+testTypeContains(true, parameterizedType(pa, 'a'), parameterizedType(pa, 'a'))
 testTypeContains(false,
-  parameterizedType(ga, 'a'),
-  parameterizedType(ga, gb, 'a'))
-testTypeContains(false, parameterizedType(ga, 'a'), parameterizedType(ga, 'b'))
+  parameterizedType(pa, 'a'),
+  parameterizedType(pa, pb, 'a'))
+testTypeContains(false, parameterizedType(pa, 'a'), parameterizedType(pa, 'b'))
 testTypeContains(true,
-  argumentsType(ga, gb, gc),
-  argumentsType(gd, ge, gf))
+  argumentsType(pa, pb, pc),
+  argumentsType(pd, pe, pf))
 testTypeContains(true,
-  argumentsType(ga, ga, gb),
-  argumentsType(gc, gc, gd))
+  argumentsType(pa, pa, pb),
+  argumentsType(pc, pc, pd))
 testTypeContains(false,
-  argumentsType(ga, gb, gb),
-  argumentsType(gc, gc, gd))
+  argumentsType(pa, pb, pb),
+  argumentsType(pc, pc, pd))
 testTypeContains(false,
-  argumentsType(ga, a, gb),
-  argumentsType(gc, gd, ge))
+  argumentsType(pa, a, pb),
+  argumentsType(pc, pd, pe))
 testTypeContains(true,
-  argumentsType(gc, gd, ge),
-  argumentsType(ga, a, gb))
+  argumentsType(pc, pd, pe),
+  argumentsType(pa, a, pb))
 testTypeContains(true,
-  argumentsType(ga, ga, gb),
-  argumentsType(ga, ga, gc))
+  argumentsType(pa, pa, pb),
+  argumentsType(pa, pa, pc))
 testTypeContains(false,
-  argumentsType(ga, gb, gb),
-  argumentsType(ga, ga, gb))
+  argumentsType(pa, pb, pb),
+  argumentsType(pa, pa, pb))
 testTypeContains(true,
   argumentsType(typeParameter('a'), typeParameter('a'), typeParameter('b')),
   argumentsType(typeParameter('a'), typeParameter('a'), typeParameter('c')))
 testTypeContains(false,
   argumentsType(typeParameter('a'), typeParameter('b'), typeParameter('b')),
   argumentsType(typeParameter('a'), typeParameter('a'), typeParameter('b')))
-testTypeContains(true, parameterizedType(gb, 'a'), parameterizedType(c, 'a'))
+testTypeContains(true, parameterizedType(pb, 'a'), parameterizedType(c, 'a'))
 testTypeContains(true,
   recordType(takes(Number, 'a')),
   recordType(takes(Number, 'a')))
@@ -127,7 +129,13 @@ testTypeContains(true,
   mapType.of(Number))
 testTypeContains(true, mapType, mapType.of(Number))
 testTypeContains(true, arrayType, arrayType.of(Number))
-testTypeContains(true, ga, arrayType)
+testTypeContains(true, pa, arrayType)
+testTypeContains(true,
+  functionType(takes(Number), returns(String)),
+  functionType(takes(Number), returns(String)))
+testTypeContains(true,
+  functionType(takes(pa), returns(String)),
+  functionType(takes(Number), returns(String)))
 
 //////////////////////////////////////////
 // Test unions containing other unions. //
@@ -203,7 +211,7 @@ function testUnion() {
 testUnion(unionType(Number, Boolean), Number, Boolean)
 testUnion(Number, Number)
 testUnion(Number, Number, Number)
-testUnion(ga, Number, ga)
+testUnion(pa, Number, pa)
 testUnion(unionType(Number, Boolean, String), Number, Boolean, String)
 testUnion(argumentsType(Number, Boolean),
   argumentsType(Number, Boolean),
