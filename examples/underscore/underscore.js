@@ -9,5 +9,3 @@ function sliceUpTo(arg0, arg1) {
 function safeSliceUpTo(arg0, arg1) {
   return sliceUpTo(arg0, arg1 < 0 ? 0 : arg1);
 }
-
-// Failed first
