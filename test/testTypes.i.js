@@ -154,12 +154,12 @@ function testUnionContains(expected, genericUnion, typeFilters) {
   })
 
   tap.log(
-     genericUnion.containsType(expected, typeFilters),
-     genericUnion.toString(),
-     '+',
-     JSON.stringify(filterObj),
-     'contains type',
-     expected.toString())
+    genericUnion.containsType(expected, typeFilters),
+    genericUnion.toString(),
+    '+',
+    JSON.stringify(filterObj),
+    'contains type',
+    expected.toString())
 
   tap.log(
     expected.equals(filteredType),
