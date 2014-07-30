@@ -133,9 +133,20 @@ testTypeContains(true, pa, arrayType)
 testTypeContains(true,
   functionType(takes(Number), returns(String)),
   functionType(takes(Number), returns(String)))
+// Covariance
 testTypeContains(true,
+  functionType(takes(Number), returns(pa)),
+  functionType(takes(Number), returns(String)))
+testTypeContains(false,
+  functionType(takes(Number), returns(String)),
+  functionType(takes(Number), returns(pa)))
+// Contravariance
+testTypeContains(false,
   functionType(takes(pa), returns(String)),
   functionType(takes(Number), returns(String)))
+testTypeContains(true,
+  functionType(takes(Number), returns(String)),
+  functionType(takes(pa), returns(String)))
 
 //////////////////////////////////////////
 // Test unions containing other unions. //
