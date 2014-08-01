@@ -1,3 +1,5 @@
+'use strict'
+
 var fs = require('fs')
   , typeUtil = require('../lib/types/typeUtil.js')
   , fileContext = require('../lib/fileContext.js')

@@ -1,3 +1,5 @@
+'use strict'
+
 var inductive = require('./inductive.js').globals()
   , argv = process.argv.slice(2)
   , helps = ['help', '-help', '--help', '-h', '--h', '/?', '/help']

@@ -1,3 +1,5 @@
+'use strict'
+
 var inductive = require('../lib/inductive.js')
   , fileOptions = inductive.fileOptions
   , type = inductive.type
