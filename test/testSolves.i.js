@@ -697,9 +697,9 @@ specify('mockGetTimeWithMockEach',
       shouldReturn(undefined),
       mock(jQueryAddClass, verify('#el', 'hilite'))),
     use(jQueryAddClass))
-})(),
+})()
 
-(function mockLogFileContentsTest() {
+;(function mockLogFileContentsTest() {
 
   var readFileCallback = type('readFileCallback')
     , bufferType = recordType(forConstructor('Buffer'))
