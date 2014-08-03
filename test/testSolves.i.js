@@ -74,7 +74,7 @@ fileOptions.termCheck = 10
 fileOptions.throwCacheErrors = true
 fileOptions.timeout = 0
 fileOptions.verbosity = 0
-fileOptions.testsToRun = null
+fileOptions.testsToRun = ['matchArgAndDouble']
 
 var farenheit = smallType('farenheit', Number)
   , celsius = smallType('celsius', Number)
@@ -159,17 +159,24 @@ specify('matchExplicitAndDouble',
   use('Number+', 'String+',
     match(Number, String)))
 
-specify('matchArgAndDouble',
-  given(1, shouldReturn(2)),
-  given('a', shouldReturn('aa')),
-  use('Number+', 'String+',
-    matchArguments()))
+specify('matchArgs',
+  given(2, 5, shouldReturn(null)),
+  given(2, 'x', shouldReturn(2)),
+  given('a', 'b', shouldReturn(undefined)),
+  given('x', 1, shouldReturn('x')),
+  use(values(null, undefined), matchArguments()))
 
 specify('matchArgsAndAdd',
   given(2, 5, shouldReturn(7)),
+  given(2, 'x', shouldReturn(null)),
   given('a', 'b', shouldReturn('ab')),
-  use('Number+', 'String+',
-    matchArguments()))
+  given('x', 1, shouldReturn(null)),
+  use('Number+', 'String+', value(null), matchArguments()))
+
+specify('matchArgAndDouble',
+  given(1, shouldReturn(2)),
+  given('a', shouldReturn('aa')),
+  use('Number+', 'String+', matchArguments()))
 
 // Records
 specify('pair',
