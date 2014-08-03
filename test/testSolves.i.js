@@ -74,7 +74,7 @@ fileOptions.termCheck = 10
 fileOptions.throwCacheErrors = true
 fileOptions.timeout = 0
 fileOptions.verbosity = 0
-fileOptions.testsToRun = ['matchArgAndDouble']
+fileOptions.testsToRun = null
 
 var farenheit = smallType('farenheit', Number)
   , celsius = smallType('celsius', Number)
