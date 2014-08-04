@@ -932,6 +932,11 @@ var Person = specifyConstructor('Person',
   given('john', 'smith',
     shouldReturn({ first: 'john', last: 'smith' })))
 
+specifyConstructor('MatchArgTagObject',
+  given(2, shouldReturn({ tag: 2 })),
+  given('a', shouldReturn({ tag: 'a' })),
+  use(matches()))
+
 var Employee = specifyConstructor('Employee',
   inherit(Person, 'first', 'last'),
   given('john', 'smith', 10,
