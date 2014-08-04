@@ -39,7 +39,6 @@ var inductive = require('../lib/inductive.js')
   , memberCalls = inductive.memberCalls
   , memberCall = inductive.memberCall
   , recursion = inductive.recursion
-  , accumulator = inductive.accumulator
   , beforeAll = inductive.beforeAll
   , before = inductive.before
   , after = inductive.after
@@ -491,12 +490,24 @@ specify('deepChainSpecs',
   use('+1', chainSpecs))
 
 specify('listReverse',
-  given(null, shouldReturn(null)),
-  given({ head: 1, tail: null }, shouldReturn({ head: 1, tail: null })),
-  given({ head: 1, tail: { head: 2, tail: null } },
+  given(
+    null,
+    null,
+    shouldReturn(null)),
+  given(
+    { head: 1, tail: null },
+    null,
+    shouldReturn({ head: 1, tail: null })),
+  given(
+    { head: 2, tail: null },
+    { head: 1, tail: null },
+    shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
+  given(
+    { head: 1, tail: { head: 2, tail: null } },
+    null,
     shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
   use(
-    accumulator(null),
+    recursion(),
     matches(),
     members(),
     objectCreates()))
