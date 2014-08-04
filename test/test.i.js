@@ -7,13 +7,13 @@ var fs = require('fs')
   , globalOptions = inductive.globalOptions
 
 globalOptions.maxAstNodes = 20
-globalOptions.recordTypeDetail = true
+globalOptions.recordTypeDetail = false
 Error.stackTraceLimit = 20
 
 var cacheFile = __dirname + '/.inductive.cache.json'
 if(fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile)
 
-require('./testTypes.i.js')
+//require('./testTypes.i.js')
 require('./testSolves.i.js')
 require('./testFiles.i.js')
 

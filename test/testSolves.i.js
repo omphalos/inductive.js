@@ -159,6 +159,60 @@ specify('matchExplicitAndDouble',
   use('Number+', 'String+',
     match(Number, String)))
 
+// String ... -> takes String | undefined
+// Number ... -> takes Number | null
+
+// String, String -> takes undefined
+// String, Number -> takes String
+
+// Number, Number -> takes null
+// Number, String -> takes Number
+/*
+  match String | Number #arg0
+  | String ->
+    match String | Number #arg1
+    | String -> undefined
+    | Number -> String
+  | Number ->
+    match String | Number #arg1
+    | String -> Number
+    | Number -> null
+
+
+
+
+  match arg0 returns String | Number | undefined | null
+    takes arg0(String | Number)
+    | String takes String | undefined
+    | Number takes Number | null
+
+  match arg1 returns String | undefined
+    takes arg1(String | Number)
+    | String takes undefined
+    | undefined takes String
+
+  match arg1 returns Number | null
+    takes arg1(String | Number)
+    | String takes Number
+    | Number takes null
+
+  ***
+
+  match : (String | Number | undefined | null)
+    takes ((String | Number),
+    (String | undefined),
+    (Number | null)) #arg0
+
+  match : (String | undefined)
+    takes ((String | Number),
+    String,
+    undefined) #arg1
+
+  match : (Number | null)
+    takes ((String | Number),
+    Number,
+    null) #arg1
+*/
 specify('matchArgs',
   given(2, 5, shouldReturn(null)),
   given(2, 'x', shouldReturn(2)),
@@ -483,9 +537,35 @@ specify('deepChainSpecs',
   given(3, shouldReturn(37)),
   use('+1', chainSpecs))
 
+specify('listReverseWithArgMatch',
+  given(
+    null,
+    null,
+    shouldReturn(null)),
+  given(
+    null,
+    { head: 2, tail: { head: 1, tail: null } },
+    shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
+  given(
+    { head: 1, tail: null },
+    { head: 2, tail: null },
+    shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
+  given(
+    { head: 1, tail: null },
+    null,
+    shouldReturn({ head: 1, tail: null })),
+  given(
+    { head: 1, tail: { head: 2, tail: null } },
+    null,
+    shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
+  use(
+    matchArguments(),
+    members(),
+    objectCreates()))
+
 specify('listReverse',
   given(null, shouldReturn(null)),
-  given({ head: 1, tail: null}, shouldReturn({ head: 1, tail: null})),
+  given({ head: 1, tail: null }, shouldReturn({ head: 1, tail: null })),
   given({ head: 1, tail: { head: 2, tail: null } },
     shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
   use(
