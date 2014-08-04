@@ -159,60 +159,6 @@ specify('matchExplicitAndDouble',
   use('Number+', 'String+',
     match(Number, String)))
 
-// String ... -> takes String | undefined
-// Number ... -> takes Number | null
-
-// String, String -> takes undefined
-// String, Number -> takes String
-
-// Number, Number -> takes null
-// Number, String -> takes Number
-/*
-  match String | Number #arg0
-  | String ->
-    match String | Number #arg1
-    | String -> undefined
-    | Number -> String
-  | Number ->
-    match String | Number #arg1
-    | String -> Number
-    | Number -> null
-
-
-
-
-  match arg0 returns String | Number | undefined | null
-    takes arg0(String | Number)
-    | String takes String | undefined
-    | Number takes Number | null
-
-  match arg1 returns String | undefined
-    takes arg1(String | Number)
-    | String takes undefined
-    | undefined takes String
-
-  match arg1 returns Number | null
-    takes arg1(String | Number)
-    | String takes Number
-    | Number takes null
-
-  ***
-
-  match : (String | Number | undefined | null)
-    takes ((String | Number),
-    (String | undefined),
-    (Number | null)) #arg0
-
-  match : (String | undefined)
-    takes ((String | Number),
-    String,
-    undefined) #arg1
-
-  match : (Number | null)
-    takes ((String | Number),
-    Number,
-    null) #arg1
-*/
 specify('matchArgs',
   given(2, 5, shouldReturn(null)),
   given(2, 'x', shouldReturn(2)),
@@ -225,6 +171,13 @@ specify('matchArgsAndAdd',
   given(2, 'x', shouldReturn(null)),
   given('a', 'b', shouldReturn('ab')),
   given('x', 1, shouldReturn(null)),
+  use('Number+', 'String+', value(null), matchArguments()))
+
+specify('matchArgsAndAddWithNonUnionMiddleParam',
+  given(2, 'ignore', 5, shouldReturn(7)),
+  given(2, 'ignore', 'x', shouldReturn(null)),
+  given('a', 'ignore', 'b', shouldReturn('ab')),
+  given('x', 'ignore', 1, shouldReturn(null)),
   use('Number+', 'String+', value(null), matchArguments()))
 
 specify('matchArgAndDouble',
@@ -536,32 +489,6 @@ var chainSpecs = specify('chainSpecs',
 specify('deepChainSpecs',
   given(3, shouldReturn(37)),
   use('+1', chainSpecs))
-
-specify('listReverseWithArgMatch',
-  given(
-    null,
-    null,
-    shouldReturn(null)),
-  given(
-    null,
-    { head: 2, tail: { head: 1, tail: null } },
-    shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
-  given(
-    { head: 1, tail: null },
-    { head: 2, tail: null },
-    shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
-  given(
-    { head: 1, tail: null },
-    null,
-    shouldReturn({ head: 1, tail: null })),
-  given(
-    { head: 1, tail: { head: 2, tail: null } },
-    null,
-    shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
-  use(
-    matchArguments(),
-    members(),
-    objectCreates()))
 
 specify('listReverse',
   given(null, shouldReturn(null)),
@@ -888,6 +815,13 @@ specify('thisMatchArgAndDouble',
   given(4, givenContext({ a: 1 }), shouldReturn(5)),
   given('a', givenContext({ a: 1 }), shouldReturn(1)),
   use('Number+', matchArguments(), members()))
+
+specify('thisMatchThisAndDouble',
+  given('b', givenContext('a'), shouldReturn('ba')),
+  given('b', givenContext(4), shouldReturn(null)),
+  given(5, givenContext(4), shouldReturn(9)),
+  given(5, givenContext('a'), shouldReturn(null)),
+  use('Number+', 'String+', matchArguments(), value(null)))
 
 specify('memberThisCaller',
   given({
