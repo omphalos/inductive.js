@@ -51,8 +51,8 @@ function asArguments(arr) {
 }
 
 fileOptions.verbosity = 7
-/*
 fileOptions.maxAstNodes = 17
+
 var first = specify('first',
   takes(unionType(null, Array, argumentsObjectType)),
   takes(unionType(Number, undefined)),
@@ -86,7 +86,7 @@ var first = specify('first',
     getElement0,
     safeSliceUpTo,
     value(undefined)))
-*/
+
 /*
 // _ should be wrapped
 var _ = specifyConstructor('_',
