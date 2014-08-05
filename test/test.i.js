@@ -12,7 +12,6 @@ Error.stackTraceLimit = 15
 
 var cacheFile = __dirname + '/.inductive.cache.json'
 if(fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile)
-
 require('./testTypes.i.js')
 require('./testSolves.i.js')
 require('./testFiles.i.js')
