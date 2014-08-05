@@ -555,6 +555,23 @@ specify('shouldThrow',
   given(1, shouldThrow(function(err) { return err.message === '123' })),
   use('throw', value('123')))
 
+specify('doTryCatchFinally',
+  setOptions({ allowErrors: true }),
+  givenNoArgs(
+    shouldReturn(4),
+    mock('console.log', verify('cleanup'))),
+  givenNoArgs(
+    shouldReturn(undefined),
+    mock(return4, callback(function() { throw 123 })),
+    mock('console.log', verify('cleanup'))),
+  use(
+    return4,
+    'tryCatchFinally',
+    'console.log',
+    ',',
+    functionExpressions(),
+    values(undefined, 'cleanup')))
+
 // Boundary checking for scenario specs
 specify('returnUndefined',
   givenNoArgs(shouldReturn()),
@@ -564,6 +581,23 @@ specify('returnUndefined',
 specify('returnGreaterThan',
   given(2, shouldReturn['>'](3)),
   use('Number+'))
+
+specify('returnLessThan',
+  given(2, shouldReturn['<'](3)))
+
+specify('returnEqual',
+  given(0, shouldReturn['==='](0)))
+
+specify('returnNotEqual',
+  given(0, shouldReturn['!=='](1)))
+
+specify('returnGreaterThanOrEqualTo',
+  given(3, shouldReturn['>='](3)),
+  given(4, shouldReturn['>='](3)))
+
+specify('returnLessThanOrEqualTo',
+  given(3, shouldReturn['<='](3)),
+  given(2, shouldReturn['<='](3)))
 
 // Inverse comparands
 specify('returnNotLessThan',
