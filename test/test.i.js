@@ -8,7 +8,7 @@ var fs = require('fs')
 
 globalOptions.maxAstNodes = 20
 globalOptions.recordTypeDetail = false
-Error.stackTraceLimit = 30
+Error.stackTraceLimit = 15
 
 var cacheFile = __dirname + '/.inductive.cache.json'
 if(fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile)

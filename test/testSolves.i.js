@@ -568,9 +568,37 @@ specify('doTryCatchFinally',
     return4,
     'tryCatchFinally',
     'console.log',
-    ',',
     functionExpressions(),
     values(undefined, 'cleanup')))
+
+specify('doTryCatch',
+  setOptions({ allowErrors: true }),
+  givenNoArgs(
+    shouldReturn(4)),
+  givenNoArgs(
+    shouldReturn(undefined),
+    mock(return4, callback(function() { throw 123 }))),
+  use(
+    return4,
+    'tryCatch',
+    functionExpressions(),
+    value(undefined)))
+
+specify('doTryFinally',
+  setOptions({ allowErrors: true }),
+  givenNoArgs(
+    shouldReturn(4),
+    mock('console.log', verify('cleanup'))),
+  givenNoArgs(
+    shouldThrow(),
+    mock(return4, callback(function() { throw 123 })),
+    mock('console.log', verify('cleanup'))),
+  use(
+    return4,
+    'tryFinally',
+    'console.log',
+    functionExpressions(),
+    value('cleanup')))
 
 // Boundary checking for scenario specs
 specify('returnUndefined',
@@ -965,11 +993,6 @@ specify('mockDouble2Log',
 var Person = specifyConstructor('Person',
   given('john', 'smith',
     shouldReturn({ first: 'john', last: 'smith' })))
-
-specifyConstructor('MatchArgTagObject',
-  given(2, shouldReturn({ tag: 2 })),
-  given('a', shouldReturn({ tag: 'a' })),
-  use(matches()))
 
 var Employee = specifyConstructor('Employee',
   inherit(Person, 'first', 'last'),
