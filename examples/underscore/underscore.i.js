@@ -21,7 +21,7 @@ test('first', function() {
 
 var getElement0 = specify('getElement0',
   takes(Array),
-  returns(typeParameter('a')),
+  returns(unionType(undefined, typeParameter('a'))),
   given([1, 2, 3], shouldReturn(1)),
   given([], shouldReturn(undefined)),
   use('Array.element', values(0)))
@@ -33,7 +33,21 @@ var sliceUpTo = specify('sliceUpTo',
   given([1, 2, 3], 2, shouldReturn([1, 2])),
   use('Array.slice2', values(0)))
 
+globalOptions.uniqueTypeDetail = true
+
 var safeSliceUpTo = specify('safeSliceUpTo',
+  setOptions({
+    verbosity: 7,
+    maxAstNodes: 10,
+    searchPath: function() {/*
+safeSliceUpTo : (Array<#a>, Number) -> Array<#a> takes (Array<#a>)
+⌞ ?: : Array<#a> takes (Boolean, Array<#a>, Array<#a>)
+  ⌞ Number< : Boolean takes (Number, Number)
+    ⌞ arg1 : Number
+    ⌞ 0 : Number
+  ⌞ [] : Array<#a>
+  ⌞*/}
+  }),
   takes(Array),
   takes(Number),
   returns(Array),
@@ -44,8 +58,9 @@ var safeSliceUpTo = specify('safeSliceUpTo',
   given([1, 2, 3], 3, shouldReturn([1, 2, 3])),
   given([1, 2], 2, shouldReturn([1, 2])),
   given([1, 2, 3], 4, shouldReturn([1, 2, 3])),
-  use(sliceUpTo, '?:', 'Number<', value(0)))
+  use(sliceUpTo, '?:', 'Number<', values(0, [])))
 
+return
 var first = specify('first',
   takes(unionType(null, Array, argumentsObjectType)),
   takes(unionType(Number, undefined)),
