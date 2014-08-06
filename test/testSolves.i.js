@@ -66,6 +66,8 @@ var inductive = require('../lib/inductive.js')
   , arrayType = inductive.arrayType
   , requires = inductive.requires
   , globalOptions = inductive.globalOptions
+  , asArguments = inductive.asArguments
+  , argumentsObjectType = inductive.argumentsObjectType
 
 fileOptions.searchPath = null
 fileOptions.stopOnFailure = true
@@ -1201,9 +1203,9 @@ specify('recordCompat3',
 */
 
 specify('argumentsAsArray',
+  takes(argumentsObjectType),
   returns(Array),
-  given((function() { return arguments })(1, 2, 3),
-    shouldReturn([1, 2])),
+  given(asArguments([1, 2, 3]), shouldReturn([1, 2])),
   use('Array.slice2', 'Array.fromArguments', values(0, 2)))
 
 specify('hypotenuse',

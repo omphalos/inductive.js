@@ -46,17 +46,16 @@ var safeSliceUpTo = specify('safeSliceUpTo',
   given([1, 2, 3], 4, shouldReturn([1, 2, 3])),
   use(sliceUpTo, '?:', 'Number<', value(0)))
 
-function asArguments(arr) {
-  return (function() { return arguments }).apply(null, arr)
-}
-
-fileOptions.verbosity = 7
-fileOptions.maxAstNodes = 17
-
 var first = specify('first',
   takes(unionType(null, Array, argumentsObjectType)),
   takes(unionType(Number, undefined)),
   returns(unionType(typeParameter('a'), Array)),
+
+  setOptions({
+    verbosity: 9,
+    maxAstNodes: 17,
+    timeout: 2000
+  }),
 
   // Handle undefined
   given(null, undefined, shouldReturn(undefined)),
