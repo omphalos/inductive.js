@@ -33,21 +33,7 @@ var sliceUpTo = specify('sliceUpTo',
   given([1, 2, 3], 2, shouldReturn([1, 2])),
   use('Array.slice2', values(0)))
 
-globalOptions.uniqueTypeDetail = true
-
 var safeSliceUpTo = specify('safeSliceUpTo',
-  setOptions({
-    verbosity: 7,
-    maxAstNodes: 10,
-    searchPath: function() {/*
-safeSliceUpTo : (Array<#a>, Number) -> Array<#a> takes (Array<#a>)
-⌞ ?: : Array<#a> takes (Boolean, Array<#a>, Array<#a>)
-  ⌞ Number< : Boolean takes (Number, Number)
-    ⌞ arg1 : Number
-    ⌞ 0 : Number
-  ⌞ [] : Array<#a>
-  ⌞*/}
-  }),
   takes(Array),
   takes(Number),
   returns(Array),
@@ -60,17 +46,30 @@ safeSliceUpTo : (Array<#a>, Number) -> Array<#a> takes (Array<#a>)
   given([1, 2, 3], 4, shouldReturn([1, 2, 3])),
   use(sliceUpTo, '?:', 'Number<', values(0, [])))
 
-return
 var first = specify('first',
   takes(unionType(null, Array, argumentsObjectType)),
   takes(unionType(Number, undefined)),
-  returns(unionType(typeParameter('a'), Array)),
+  returns(unionType(typeParameter('a'), Array, undefined)),
 
   setOptions({
-    verbosity: 9,
+    verbosity: 7,
     maxAstNodes: 17,
     timeout: 2000
   }),
+
+// todo remove
+// should use safeSliceUpTo for this
+/*
+correct matches
+first : ((Arguments<#a> | Array<#a> | null), (Number | undefined)) -> (#a | Array<#a>) takes ((#a | Array<#a>))
+  should be
+
+matchArg : ('a | Array<'a>) takes ((Arguments<'a> | Array<'a> | null), ('a | Array<'a>), ('a | Array<'a>), ('a | Array<'a>)) #arg0
+matchArg : ('a | Array<'a>) takes ((Number | undefined), ('a | Array<'a>), ('a | Array<'a>)) #arg1
+matchArg : ('a | Array<'a>) takes ((Number | undefined), ('a | Array<'a>), ('a | Array<'a>)) #arg1
+matchArg : ('a | Array<'a>) takes ((Number | undefined), ('a | Array<'a>), ('a | Array<'a>)) #arg1
+*/
+  given(asArguments([1, 2, 3]), 2, shouldReturn([1, 2])),
 
   // Handle undefined
   given(null, undefined, shouldReturn(undefined)),
