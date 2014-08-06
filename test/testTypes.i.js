@@ -17,6 +17,7 @@ var inductive = require('../lib/inductive.js')
   , typeParameter = inductive.typeParameter
   , recordType = inductive.recordType
   , unionType = inductive.unionType
+  , argumentsObjectType = inductive.argumentsObjectType
 
 /////////////////////////////////
 // Test typeParameter subset checks. //
@@ -57,6 +58,9 @@ function testTypeContains(expect, x, y) {
     y.toString())
 }
 
+/* testTypeContains(true,
+  unionType(argumentsObjectType, arrayType),
+  unionType(argumentsObjectType.of(Number), arrayType)) */
 testTypeContains(true, pa, a)
 testTypeContains(false, a, pa)
 testTypeContains(true, a, a)
