@@ -12,9 +12,21 @@ var jQueryGetString = isolate('$.getString',
   returns(Deferred),
   as('$.get(@url, @fn)'))
 
+var setHtml = isolate('setHtml',
+  takes(String, '@selector'),
+  takes(String, '@html'),
+  returns(undefined),
+  as("void $(@selector).html(@html)"))
+
+var setBodyHtml = specify('setBodyHtml',
+  given('new html',
+    mock(setHtml,
+      verify('body', 'new html'))),
+  use(value('body'), setHtml))
+
 run(
 
-  specify('logJson',
+  specify('main',
 
     returns(Deferred),
 
@@ -25,26 +37,15 @@ run(
           callbackFn('contents')
           return Deferred.instantiate()
         }),
-        verify('data.json')),
+        verify('data.txt')),
 
-      mock('console.logString',
+      mock(setBodyHtml,
         verify('contents'))),
-
-    givenNoArgs(
-
-      mock(jQueryGetString,
-        callback(function noCallback() {
-          return Deferred.instantiate()
-        }),
-        verify('data.json')),
-
-      mock('console.logString',
-        verifyNotCalled())),
 
     use(
       jQueryGetString,
-      'console.logString',
+      setBodyHtml,
       functionExpressions(),
-      value('data.json'))))
+      value('data.txt'))))
 
 saveAll()

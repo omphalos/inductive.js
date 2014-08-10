@@ -1,7 +1,11 @@
-function logJson() {
-  return $.get('data.json', function fn(arg0) {
-    return console.log(arg0);
+function setBodyHtml(arg0) {
+  return void $('body').html(arg0);
+}
+
+function main() {
+  return $.get('data.txt', function fn(arg0) {
+    return setBodyHtml(arg0);
   });
 }
 
-logJson();
+main();
