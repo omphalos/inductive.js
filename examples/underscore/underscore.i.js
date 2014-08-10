@@ -57,19 +57,38 @@ var first = specify('first',
     timeout: 2000
   }),
 
-// todo remove
-// should use safeSliceUpTo for this
 /*
+need to be able to set type arguments per scenario
+
 correct matches
 first : ((Arguments<#a> | Array<#a> | null), (Number | undefined)) -> (#a | Array<#a>) takes ((#a | Array<#a>))
   should be
+
+match arg0 (Arguments<#a> | Array<#a> | null) returns ('a | Array<'a> | undefined)
+| Arguments<#a> ->
+  match arg1 (Number | undefined) returns (#a | Array<#a>)
+  | Number -> Array<#a>
+  | undefined -> #a
+| Array<#a> ->
+  match arg1 (Number | undefined) returns (#a | Array<#a>)
+  | Number -> Array<#a>
+  | undefined -> #a
+| null ->
+  match arg1 (Number | undefined) returns undefined
+  | Number -> undefined
+  | undefined -> undefined
 
 matchArg : ('a | Array<'a>) takes ((Arguments<'a> | Array<'a> | null), ('a | Array<'a>), ('a | Array<'a>), ('a | Array<'a>)) #arg0
 matchArg : ('a | Array<'a>) takes ((Number | undefined), ('a | Array<'a>), ('a | Array<'a>)) #arg1
 matchArg : ('a | Array<'a>) takes ((Number | undefined), ('a | Array<'a>), ('a | Array<'a>)) #arg1
 matchArg : ('a | Array<'a>) takes ((Number | undefined), ('a | Array<'a>), ('a | Array<'a>)) #arg1
 */
-  given(asArguments([1, 2, 3]), 2, shouldReturn([1, 2])),
+// todo remove
+  when(
+    takes(argumentsObjectType), takes(Number), returns(Array),
+    given(
+      asArguments([1, 2, 3]), 2,
+      shouldReturn([1, 2]))),
 
   // Handle undefined
   given(null, undefined, shouldReturn(undefined)),
