@@ -43,3 +43,15 @@ function first(arg0, arg1) {
     throw new Error('Unexpected type: ' + refinement2);
   }();
 }
+
+function UnderscoreCtor(arg0) {
+  this['_wrapped'] = arg0;
+}
+
+function _(arg0) {
+  return new UnderscoreCtor(arg0);
+}
+
+// Failed _first
+
+UnderscoreCtor.prototype.first = _first;
