@@ -7,7 +7,7 @@ var inductive = require('../../../lib/inductive.js')
   , requires = inductive.requires
   , as = inductive.as
   , takes = inductive.takes
-  , givenContext = inductive.givenContext
+  , context = inductive.context
   , returns = inductive.returns
   , express = inductive.express
   , assign = inductive.assign
@@ -40,7 +40,7 @@ var Human = specifyConstructor('Human',
 
 var fullName = specify('fullName',
   givenNoArgs(
-    givenContext(Human.instantiate({ first: 'abe', last: 'lincoln' })),
+    context(Human.instantiate({ first: 'abe', last: 'lincoln' })),
     shouldReturn('abe lincoln')),
   use('String+',
     value(' '),

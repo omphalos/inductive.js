@@ -132,22 +132,22 @@ var _first = specify('_first',
     returns(UnderscoreCtor),
 
     given(
-      givenContext(UnderscoreCtor.instantiate({ _wrapped: asArguments([1]) })),
+      context(UnderscoreCtor.instantiate({ _wrapped: asArguments([1]) })),
       1,
       shouldReturn(UnderscoreCtor.instantiate({ _wrapped: [1] }))),
 
     given(
-      givenContext(UnderscoreCtor.instantiate({ _wrapped: undefined })),
+      context(UnderscoreCtor.instantiate({ _wrapped: undefined })),
       1,
       shouldReturn(UnderscoreCtor.instantiate({ _wrapped: undefined }))),
 
     given(
-      givenContext(UnderscoreCtor.instantiate({ _wrapped: [] })),
+      context(UnderscoreCtor.instantiate({ _wrapped: [] })),
       1,
       shouldReturn(UnderscoreCtor.instantiate({ _wrapped: [] }))),
 
     given(
-      givenContext(UnderscoreCtor.instantiate({ _wrapped: [1, 2, 3] })),
+      context(UnderscoreCtor.instantiate({ _wrapped: [1, 2, 3] })),
       1,
       shouldReturn(UnderscoreCtor.instantiate({ _wrapped: [1] })))),
 

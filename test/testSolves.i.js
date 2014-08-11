@@ -58,7 +58,7 @@ var inductive = require('../lib/inductive.js')
   , isolate = inductive.isolate
   , verifyNotCalled = inductive.verifyNotCalled
   , inherit = inductive.inherit
-  , givenContext = inductive.givenContext
+  , context = inductive.context
   , takesContext = inductive.takesContext
   , assign = inductive.assign
   , recordType = inductive.recordType
@@ -870,7 +870,7 @@ specifyConstructor('mockChild',
 
 var specifyThis = specify('specifyThis',
   given(2,
-    givenContext({ a: 1 }),
+    context({ a: 1 }),
     shouldReturn(3)),
   use('Number+', members()))
 
@@ -894,15 +894,15 @@ specify('callParamOnlyThisSpec',
   use(calls()))
 
 specify('thisMatchArgAndDouble',
-  given(4, givenContext({ a: 1 }), shouldReturn(5)),
-  given('a', givenContext({ a: 1 }), shouldReturn(1)),
+  given(4, context({ a: 1 }), shouldReturn(5)),
+  given('a', context({ a: 1 }), shouldReturn(1)),
   use('Number+', matchArguments(), members()))
 
 specify('thisMatchThisAndDouble',
-  given('b', givenContext('a'), shouldReturn('ba')),
-  given('b', givenContext(4), shouldReturn(null)),
-  given(5, givenContext(4), shouldReturn(9)),
-  given(5, givenContext('a'), shouldReturn(null)),
+  given('b', context('a'), shouldReturn('ba')),
+  given('b', context(4), shouldReturn(null)),
+  given(5, context(4), shouldReturn(9)),
+  given(5, context('a'), shouldReturn(null)),
   use('Number+', 'String+', matchArguments(), value(null)))
 
 specify('memberThisCaller',
@@ -936,13 +936,13 @@ specify('memberThisCallerExplicit',
     member('c')))
 
 specify('arrayFilterEvenThis',
-  givenNoArgs(givenContext([1, 2, 3, 4, 5, 6]), shouldReturn([2, 4, 6])),
+  givenNoArgs(context([1, 2, 3, 4, 5, 6]), shouldReturn([2, 4, 6])),
   use('Array.filter', '%', '===Number',
     values(2, 0),
     functionExpressions()))
 
 specify('arrayFilterEvenThisExplicit',
-  givenNoArgs(givenContext([1, 2, 3, 4, 5, 6]), shouldReturn([2, 4, 6])),
+  givenNoArgs(context([1, 2, 3, 4, 5, 6]), shouldReturn([2, 4, 6])),
   use('%', '===Number',
     express('Array.filterThis',
       takes(arrayType.of(Number), '@array'),
@@ -1010,7 +1010,7 @@ var Employee = specifyConstructor('Employee',
 
 specify('fullName',
   givenNoArgs(
-    givenContext(Person.instantiate({ first: 'john', last: 'smith' })),
+    context(Person.instantiate({ first: 'john', last: 'smith' })),
     shouldReturn('john smith')),
   use('String+', members(), value(' ')))
 
