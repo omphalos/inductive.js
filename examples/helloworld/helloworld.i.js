@@ -1,5 +1,5 @@
 // Load the DSL:
-require('./lib/inductive.js').globals()
+require('../../lib/inductive.js').globals()
 
 // Specify our program:
 run(

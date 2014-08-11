@@ -12,6 +12,7 @@ var inductive = require('../lib/inductive.js')
   , given = inductive.given
   , specify = inductive.specify
   , use = inductive.use
+  , when = inductive.when
   , values = inductive.values
   , setOptions = inductive.setOptions
   , matches = inductive.matches
@@ -531,16 +532,18 @@ specify('lifecycle',
   use('*'))
 
 specify('satisfaction',
-  returns(Number),
-  given(1, shouldSatisfy(function(x) { return x === 2 })),
-  given(3, shouldSatisfy('double 3 should be 6', function(x) {
-    return x === 6
-  })),
+  when(
+    returns(Number),
+    given(1, shouldSatisfy(function(x) { return x === 2 })),
+    given(3, shouldSatisfy('double 3 should be 6', function(x) {
+      return x === 6
+    }))),
   use('Number+'))
 
 specify('curry2',
-  returns(functionType(takes(Number), returns(Number))),
-  given(adder, 1, shouldSatisfy(function(c) { return c(3) === 4 })),
+  when(
+    returns(functionType(takes(Number), returns(Number))),
+    given(adder, 1, shouldSatisfy(function(c) { return c(3) === 4 }))),
   use(
     functionExpression(
       takes(Number),
@@ -553,8 +556,9 @@ specify('createError',
   use('new Error'))
 
 specify('shouldThrow',
-  returns(Number),
-  given(1, shouldThrow(function(err) { return err.message === '123' })),
+  when(
+    returns(Number),
+    given(1, shouldThrow(function(err) { return err.message === '123' }))),
   use('throw', value('123')))
 
 specify('doTryCatchFinally',
@@ -648,32 +652,34 @@ specify('returnNot',
   use('Number+'))
 
 specify('satisfyNot',
-  returns(Number),
-  given(3, shouldNotSatisfy(function(x) { return x < 6 })),
+  when(returns(Number),
+    given(3, shouldNotSatisfy(function(x) { return x < 6 }))),
   use('Number+'))
 
 specify('throwNot',
-  returns(Number),
-  given(1,
-    shouldNotThrow(function(err) { return err.message === '555' }),
-    as('not throw 555')),
+  when(returns(Number),
+    given(1,
+      shouldNotThrow(function(err) { return err.message === '555' }),
+      as('not throw 555'))),
   use('throw', value('123')))
 
 // TypeParameter functions
 specify('genericFn',
-  takes(typeParameter('a')),
-  returns(recordType(
-    takes(typeParameter('a'), 'lhs'),
-    takes(typeParameter('a'), 'rhs'))),
-  given(1, shouldReturn({ lhs: 1, rhs: 1 })),
+  when(
+    takes(typeParameter('a')),
+    returns(recordType(
+      takes(typeParameter('a'), 'lhs'),
+      takes(typeParameter('a'), 'rhs'))),
+    given(1, shouldReturn({ lhs: 1, rhs: 1 }))),
   use(objectCreates()))
 
 specify('conditionalSlice',
-  takes(Array),
-  takes(Boolean),
-  returns(Array),
-  given([1, 2, 3], true, shouldReturn([1, 2, 3])),
-  given([1, 2, 3], false, shouldReturn([])),
+  when(
+    takes(Array),
+    takes(Boolean),
+    returns(Array),
+    given([1, 2, 3], true, shouldReturn([1, 2, 3])),
+    given([1, 2, 3], false, shouldReturn([]))),
   use('?:', value([])))
 
 specify('mockConsoleLog',
@@ -728,24 +734,25 @@ specify('mockGetTimeWithMockEach',
     as('$.get(@url, @fn)'))
 
   return specify('mockAjaxGet',
-    returns(Deferred),
-    given('url/of/resource/to/get',
-      mock(jQueryGetString,
-        callback(function callItBack(url, callbackFn) {
-          callbackFn('contents')
-          return Deferred.instantiate()
-        }),
-        verify('url/of/resource/to/get')),
-      mock('console.logString',
-        verify('contents'))),
-    given('url/of/resource/to/get',
-      mock(jQueryGetString,
-        callback(function noCallback() {
-          return Deferred.instantiate()
-        }),
-        verify('url/of/resource/to/get')),
-      mock('console.logString',
-        verifyNotCalled())),
+    when(
+      returns(Deferred),
+      given('url/of/resource/to/get',
+        mock(jQueryGetString,
+          callback(function callItBack(url, callbackFn) {
+            callbackFn('contents')
+            return Deferred.instantiate()
+          }),
+          verify('url/of/resource/to/get')),
+        mock('console.logString',
+          verify('contents'))),
+      given('url/of/resource/to/get',
+        mock(jQueryGetString,
+          callback(function noCallback() {
+            return Deferred.instantiate()
+          }),
+          verify('url/of/resource/to/get')),
+        mock('console.logString',
+          verifyNotCalled()))),
     use(jQueryGetString, 'console.logString', functionExpressions()))
 })()
 
@@ -1042,9 +1049,10 @@ specify('mockPerson',
   use(Person))
 
 specify('simpleInheritance',
-  returns(Person),
-  given('g', 'w', 2,
-    shouldReturn(Employee.instantiate({ first: 'g', last: 'w', pay: 2 }))),
+  when(
+    returns(Person),
+    given('g', 'w', 2,
+      shouldReturn(Employee.instantiate({ first: 'g', last: 'w', pay: 2 })))),
   use(Employee))
 
 var mockConsoleLogNumber = specify('mockConsoleLogNumber',
@@ -1138,10 +1146,11 @@ var celsiusNumberToFarenheitNumber = specify('celsiusNumberToFarenheitNumber',
   use('*', 'Number+', values(9 / 5, 32)))
 
 specify('celsiusToFarenheit',
-  takes(celsius),
-  returns(farenheit),
-  given(100, shouldReturn(212)),
-  given(0, shouldReturn(32)),
+  when(
+    takes(celsius),
+    returns(farenheit),
+    given(100, shouldReturn(212)),
+    given(0, shouldReturn(32))),
   use(
     celsiusNumberToFarenheitNumber,
     celsius.convertFrom,
@@ -1153,18 +1162,20 @@ var farenheitNumberToCelsiusNumber = specify('farenheitNumberToCelsiusNumber',
   use('*', '-', values(5 / 9, 32)))
 
 specify('farenheitToCelsius',
-  takes(farenheit),
-  returns(celsius),
-  given(212, shouldReturn(100)),
-  given(32, shouldReturn(0)),
+  when(
+    takes(farenheit),
+    returns(celsius),
+    given(212, shouldReturn(100)),
+    given(32, shouldReturn(0))),
   use(
     farenheitNumberToCelsiusNumber,
     farenheit.convertFrom,
     celsius.convertTo))
 
 specify('getCelsiusConstant',
-  returns(celsius),
-  givenNoArgs(shouldReturn(33)),
+  when(
+    returns(celsius),
+    givenNoArgs(shouldReturn(33))),
   use(
     express('celsius33',
       returns(celsius),
@@ -1176,10 +1187,11 @@ specify('getCelsiusConstant',
   recGraphType.takes(farenheit, 'head')
   recGraphType.takes(unionType(null, recGraphType), 'tail')
   return specify('recursiveTemperatureRecord',
-    takes(recGraphType),
-    returns(farenheit),
-    given({ head: 1, tail: null }, shouldReturn(1)),
-    given({ head: 1, tail: { head: 2, tail: null } }, shouldReturn(1)),
+    when(
+      takes(recGraphType),
+      returns(farenheit),
+      given({ head: 1, tail: null }, shouldReturn(1)),
+      given({ head: 1, tail: { head: 2, tail: null } }, shouldReturn(1))),
     use(member('head')))
 })()
 
@@ -1203,9 +1215,10 @@ specify('recordCompat3',
 */
 
 specify('argumentsAsArray',
-  takes(argumentsObjectType),
-  returns(Array),
-  given(asArguments([1, 2, 3]), shouldReturn([1, 2])),
+  when(
+    takes(argumentsObjectType),
+    returns(Array),
+    given(asArguments([1, 2, 3]), shouldReturn([1, 2]))),
   use('Array.slice2', 'Array.fromArguments', values(0, 2)))
 
 specify('hypotenuse',

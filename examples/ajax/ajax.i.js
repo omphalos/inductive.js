@@ -28,19 +28,20 @@ run(
 
   specify('main',
 
-    returns(Deferred),
+    when(
+      returns(Deferred),
 
-    givenNoArgs(
+      givenNoArgs(
 
-      mock(jQueryGetString,
-        callback(function callItBack(url, callbackFn) {
-          callbackFn('contents')
-          return Deferred.instantiate()
-        }),
-        verify('data.txt')),
+        mock(jQueryGetString,
+          callback(function callItBack(url, callbackFn) {
+            callbackFn('contents')
+            return Deferred.instantiate()
+          }),
+          verify('data.txt')),
 
-      mock(setBodyHtml,
-        verify('contents'))),
+        mock(setBodyHtml,
+          verify('contents')))),
 
     use(
       jQueryGetString,
