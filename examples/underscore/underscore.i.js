@@ -44,80 +44,55 @@ var safeSliceUpTo = specify('safeSliceUpTo',
   given([1, 2, 3], 3, shouldReturn([1, 2, 3])),
   given([1, 2], 2, shouldReturn([1, 2])),
   given([1, 2, 3], 4, shouldReturn([1, 2, 3])),
-  use(sliceUpTo, '?:', 'Number<', values(0, [])))
+  use(sliceUpTo, '?:', 'Number<', values(0)))
 
 var first = specify('first',
-  takes(unionType(null, Array, argumentsObjectType)),
-  takes(unionType(Number, undefined)),
-  returns(unionType(typeParameter('a'), Array, undefined)),
 
-  setOptions({
-    verbosity: 7,
-    maxAstNodes: 17,
-    timeout: 2000
-  }),
+  when(takes(null), takes(undefined), returns(undefined),
+    given(null, undefined, shouldReturn(undefined))),
 
-/*
-need to be able to set type arguments per scenario
+  when(takes(null), takes(Number), returns(undefined),
+    given(null, 3, shouldReturn(undefined))),
 
-correct matches
-first : ((Arguments<#a> | Array<#a> | null), (Number | undefined)) -> (#a | Array<#a>) takes ((#a | Array<#a>))
-  should be
+  when(takes(Array), takes(Number), returns(Array),
+    given([1, 2, 3], -1, shouldReturn([])),
+    given([1, 2, 3], 5, shouldReturn([1, 2, 3])),
+    given([1, 2, 3], 2, shouldReturn([1, 2]))),
 
-match arg0 (Arguments<#a> | Array<#a> | null) returns ('a | Array<'a> | undefined)
-| Arguments<#a> ->
-  match arg1 (Number | undefined) returns (#a | Array<#a>)
-  | Number -> Array<#a>
-  | undefined -> #a
-| Array<#a> ->
-  match arg1 (Number | undefined) returns (#a | Array<#a>)
-  | Number -> Array<#a>
-  | undefined -> #a
-| null ->
-  match arg1 (Number | undefined) returns undefined
-  | Number -> undefined
-  | undefined -> undefined
+  when(takes(argumentsObjectType), takes(Number), returns(Array),
+    given(asArguments([1, 2, 3]), -1, shouldReturn([])),
+    given(asArguments([1, 2, 3]), 5, shouldReturn([1, 2, 3])),
+    given(asArguments([1, 2, 3]), 2, shouldReturn([1, 2]))),
 
-matchArg : ('a | Array<'a>) takes ((Arguments<'a> | Array<'a> | null), ('a | Array<'a>), ('a | Array<'a>), ('a | Array<'a>)) #arg0
-matchArg : ('a | Array<'a>) takes ((Number | undefined), ('a | Array<'a>), ('a | Array<'a>)) #arg1
-matchArg : ('a | Array<'a>) takes ((Number | undefined), ('a | Array<'a>), ('a | Array<'a>)) #arg1
-matchArg : ('a | Array<'a>) takes ((Number | undefined), ('a | Array<'a>), ('a | Array<'a>)) #arg1
-*/
-// todo remove
   when(
-    takes(argumentsObjectType), takes(Number), returns(Array),
-    given(
-      asArguments([1, 2, 3]), 2,
-      shouldReturn([1, 2]))),
+    takes(argumentsObjectType),
+    takes(undefined),
+    returns(
+      unionType(
+        undefined,
+        typeParameter('a')),
 
-  // Handle undefined
-  given(null, undefined, shouldReturn(undefined)),
+    given(asArguments([]), undefined, shouldReturn(undefined))),
+    given(asArguments([1, 2, 3]), undefined, shouldReturn(1))),
 
-  // Handle null
-  given(null, 3, shouldReturn(undefined)),
+  when(
+    takes(Array),
+    takes(undefined),
+    returns(
+      unionType(
+        undefined,
+        typeParameter('a')),
 
-  // Get first element
-  given([1, 2, 3], undefined, shouldReturn(1)),
-  given(asArguments([1, 2, 3]), undefined, shouldReturn(1)),
-
-  // Pass a negative index
-  given([1, 2, 3], -1, shouldReturn([])),
-  given(asArguments([1, 2, 3]), -1, shouldReturn([])),
-
-  // Pass an index
-  given([1, 2, 3], 2, shouldReturn([1, 2])),
-  given(asArguments([1, 2, 3]), 2, shouldReturn([1, 2])),
-
-  // Pass an index that's too big
-  given([1, 2, 3], 5, shouldReturn([1, 2, 3])),
-  given(asArguments([1, 2, 3]), 5, shouldReturn([1, 2, 3])),
+    given([], undefined, shouldReturn(undefined))),
+    given([1, 2, 3], undefined, shouldReturn(1))),
 
   use(
     'Array.fromArguments',
     matchArguments(),
     getElement0,
     safeSliceUpTo,
-    value(undefined)))
+    value(undefined)),
+  ignore(argumentsObjectType, Number))
 
 /*
 // _ should be wrapped
