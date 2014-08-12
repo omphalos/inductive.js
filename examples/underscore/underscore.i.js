@@ -103,6 +103,8 @@ var first = specify('first',
     value(undefined)),
   ignore(argumentsObjectType, Number))
 
+Error.stackTraceLimit = 20
+
 var UnderscoreCtor = specifyConstructor('UnderscoreCtor',
   given(undefined, shouldReturn({ _wrapped: undefined })),
   given([1, 2, 3], shouldReturn({ _wrapped: [1, 2, 3] })),
