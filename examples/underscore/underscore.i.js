@@ -95,6 +95,8 @@ var first = specify('first',
     given([], undefined, shouldReturn(undefined))),
     given([1, 2, 3], undefined, shouldReturn(1))),
 
+  setOptions({ maxAstNodes: 25 }),
+
   use(
     'Array.fromArguments',
     matchArguments(),
@@ -102,8 +104,6 @@ var first = specify('first',
     safeSliceUpTo,
     value(undefined)),
   ignore(argumentsObjectType, Number))
-
-Error.stackTraceLimit = 20
 
 var UnderscoreCtor = specifyConstructor('UnderscoreCtor',
   given(undefined, shouldReturn({ _wrapped: undefined })),
