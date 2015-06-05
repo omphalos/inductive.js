@@ -12,4 +12,4 @@
 * Remove `values` - just use `value`.
 * Improve record strings.
 * Support records with same property keys but different types.
-* Rename `ArgumentsTupleType` to `ArgumentsObjectType`.
+* Rename `ArgumentsTupleType` to `ArgumentsArrayType`.

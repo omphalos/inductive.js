@@ -17,7 +17,7 @@ var inductive = require('../lib/inductive.js')
   , typeParameter = inductive.typeParameter
   , recordType = inductive.recordType
   , unionType = inductive.unionType
-  , argumentsObjectType = inductive.argumentsObjectType
+  , argumentsArrayType = inductive.argumentsArrayType
   , smallType = inductive.smallType
 
 /////////////////////////////////
@@ -60,8 +60,8 @@ function testTypeContains(expect, x, y) {
 }
 
 /* testTypeContains(true,
-  unionType(argumentsObjectType, arrayType),
-  unionType(argumentsObjectType.of(Number), arrayType)) */
+  unionType(argumentsArrayType, arrayType),
+  unionType(argumentsArrayType.of(Number), arrayType)) */
 testTypeContains(true, pa, a)
 testTypeContains(false, a, pa)
 testTypeContains(true, a, a)
@@ -276,8 +276,8 @@ allowInstantiation(RegExp, /a/)
 disallowInstantiation(RegExp, 3)
 
 // parameterized native objects
-allowInstantiation(argumentsObjectType, typeUtil.asArguments([1, 2, 3]))
-disallowInstantiation(argumentsObjectType, [1, 2, 3])
+allowInstantiation(argumentsArrayType, typeUtil.asArguments([1, 2, 3]))
+disallowInstantiation(argumentsArrayType, [1, 2, 3])
 allowInstantiation(Array, [1, 2, 3])
 disallowInstantiation(Array, {})
 allowInstantiation(arrayType.of(String), [])

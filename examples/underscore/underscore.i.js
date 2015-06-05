@@ -20,7 +20,7 @@ var getElement0 = specify('getElement0',
 
 var getArgument0 = specify('getArgument0',
 
-  takes(argumentsObjectType),
+  takes(argumentsArrayType),
   takes(undefined),
   returns(
     unionType(
@@ -60,7 +60,7 @@ var safeSliceUpTo = specify('safeSliceUpTo',
 
 var safeSliceArgumentsUpTo = specify('safeSliceArgumentsUpTo',
 
-  takes(argumentsObjectType),
+  takes(argumentsArrayType),
   takes(Number),
   returns(Array),
 
@@ -106,12 +106,12 @@ var first = specifyMatch('first',
     getElement0,
     safeSliceUpTo,
     value(undefined)),
-  ignore(argumentsObjectType, Number))*/
+  ignore(argumentsArrayType, Number))*/
 
 var wrappedType = unionType(
   undefined,
   Array,
-  argumentsObjectType,
+  argumentsArrayType,
   typeParameter('a'))
 
 var UnderscoreCtor = specifyConstructor('UnderscoreCtor',
@@ -127,7 +127,7 @@ var UnderscoreCtor = specifyConstructor('UnderscoreCtor',
 
 var _ = specify('_',
   setOptions({ verbosity: 10 }),
-  takes(unionType(undefined, Array, argumentsObjectType)),
+  takes(unionType(undefined, Array, argumentsArrayType)),
   returns(UnderscoreCtor),
   given(undefined,
     shouldReturn(UnderscoreCtor.instantiate({ _wrapped: undefined }))),
