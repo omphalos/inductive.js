@@ -11,8 +11,8 @@ var inductive = require('../lib/inductive.js')
   , shouldReturn = inductive.shouldReturn
   , given = inductive.given
   , specify = inductive.specify
+  , specifyMatch = inductive.specifyMatch
   , use = inductive.use
-  , when = inductive.when
   , values = inductive.values
   , setOptions = inductive.setOptions
   , matches = inductive.matches
@@ -28,13 +28,12 @@ var inductive = require('../lib/inductive.js')
   , memberUpdate = inductive.memberUpdate
   , functionExpressions = inductive.functionExpressions
   , returns = inductive.returns
+  , returnsRecordThat = inductive.returnsRecordThat
   , functionExpression = inductive.functionExpression
-  , asMap = inductive.asMap
   , ignore = inductive.ignore
   , value = inductive.value
   , as = inductive.as
   , express = inductive.express
-  , asFunctionOfType = inductive.asFunctionOfType
   , calls = inductive.calls
   , call = inductive.call
   , memberCalls = inductive.memberCalls
@@ -68,6 +67,7 @@ var inductive = require('../lib/inductive.js')
   , requires = inductive.requires
   , globalOptions = inductive.globalOptions
   , asArguments = inductive.asArguments
+  , mapType = inductive.mapType
   , argumentsObjectType = inductive.argumentsObjectType
 
 fileOptions.searchPath = null
@@ -105,7 +105,7 @@ specify('isOdd',
   given(3, shouldReturn(true)),
   given(4, shouldReturn(false)),
   given(5, shouldReturn(true)),
-  use('%', '===Number', values(1, 2)))
+  use('%', '===Number', value(1), value(2)))
 
 specify('isXGreaterThanYSquared',
   given(1, 0, shouldReturn(true)),
@@ -126,7 +126,7 @@ specify('isPositiveOrOdd',
   given(2, shouldReturn(true)),
   given(3, shouldReturn(true)),
   given(4, shouldReturn(true)),
-  use('%', 'Number>', '||', values(0, 2)))
+  use('%', 'Number>', '||', value(0), value(2)))
 
 specify('cond',
   given(true, 1, 2, shouldReturn(1)),
@@ -142,50 +142,68 @@ specify('dynamicEquals',
 
 // Unions
 specify('returnUnion',
+  takes(unionType(Number, String)),
+  returns(unionType(Number, String)),
   given(1, shouldReturn(1)),
   given('str', shouldReturn('str')))
 
 specify('getArraylength',
+  takes(arrayType.of(unionType(Number, String))),
   given([1, 'two', 3, 'four'], shouldReturn(4)),
   use('Array.length'))
 
 specify('matchAndDouble',
+  takes(
+    unionType(
+      Number,
+      String)),
+  returns(
+    unionType(
+      Number,
+      String)),
   given(1, shouldReturn(2)),
   given('a', shouldReturn('aa')),
   use('Number+', 'String+',
     matches()))
 
 specify('matchExplicitAndDouble',
+  takes(unionType(Number, String)),
+  returns(unionType(Number, String)),
   given(1, shouldReturn(2)),
   given('a', shouldReturn('aa')),
   use('Number+', 'String+',
     match(Number, String)))
 
-specify('matchArgs',
-  given(2, 5, shouldReturn(null)),
-  given(2, 'x', shouldReturn(2)),
-  given('a', 'b', shouldReturn(undefined)),
-  given('x', 1, shouldReturn('x')),
-  use(values(null, undefined), matchArguments()))
+specifyMatch('matchArgsSpec',
+  specify('nullForTwoNumbers',
+    given(2, 5, shouldReturn(null)),
+    use(value(null))),
+  specify('fstNumber',
+    given(2, 'x', shouldReturn(2))),
+  specify('undefinedForTwoStrings',
+    given('a', 'b', shouldReturn(undefined)),
+    use(value(undefined))),
+  specify('fstString',
+    given('x', 1, shouldReturn('x'))))
 
-specify('matchArgsAndAdd',
-  given(2, 5, shouldReturn(7)),
-  given(2, 'x', shouldReturn(null)),
-  given('a', 'b', shouldReturn('ab')),
-  given('x', 1, shouldReturn(null)),
-  use('Number+', 'String+', value(null), matchArguments()))
+specifyMatch('matchArgAndDouble',
+  specify('doubleNumber', given(1, shouldReturn(2)), use('Number+')),
+  specify('doubleString', given('a', shouldReturn('aa')), use('String+')))
 
-specify('matchArgsAndAddWithNonUnionMiddleParam',
-  given(2, 'ignore', 5, shouldReturn(7)),
-  given(2, 'ignore', 'x', shouldReturn(null)),
-  given('a', 'ignore', 'b', shouldReturn('ab')),
-  given('x', 'ignore', 1, shouldReturn(null)),
-  use('Number+', 'String+', value(null), matchArguments()))
-
-specify('matchArgAndDouble',
-  given(1, shouldReturn(2)),
-  given('a', shouldReturn('aa')),
-  use('Number+', 'String+', matchArguments()))
+specifyMatch('matchArgsAndAddWithNonUnionMiddleParam',
+  setOptions({ maxAstNodes: 25 }),
+  specify('addNumbersIgnoringMiddleParam',
+    given(2, 'ignore', 5, shouldReturn(7)),
+    use('Number+')),
+  specify('numberAndStringReturnsNull',
+    given(2, 'ignore', 'x', shouldReturn(null)),
+    use(value(null))),
+  specify('stringAndNumberReturnsNull',
+    given('x', 'ignore', 1, shouldReturn(null)),
+    use(value(null))),
+  specify('addStringsIgnoringMiddleParam',
+    given('a', 'ignore', 'b', shouldReturn('ab')),
+    use('String+')))
 
 // Records
 specify('pair',
@@ -211,7 +229,7 @@ specify('memberAccessExplicit',
 
 specify('memberAccessExplicitType',
   given({ name: 'test' }, shouldReturn('test')),
-  use(member('name', recordType('name'))))
+  use(member('name', recordType(takes(String, 'name')))))
 
 specify('recordConstructor',
   given('test', shouldReturn({ name: 'test' })),
@@ -226,23 +244,34 @@ specify('nestedRecordConstructorUseBefore',
   given('test', shouldReturn({ name: { name: 'test' } })))
 
 specify('recordMatchExplicit',
+  takes(
+    unionType(
+      null,
+      recordType(takes(String, 'name')))),
+  returns(unionType(String, null)),
   given({ name: 'abc' }, shouldReturn('abc')),
   given(null, shouldReturn(null)),
   use(
     member('name'),
-    match(recordType('name'), null)))
+    match(recordType(takes(String, 'name')), null)))
 
 specify('recordUpdate',
   given({ first: 'grover', last: 'cleveland', age: 100 },
     shouldReturn({ first: 'grover', last: 'super', age: 110 })),
-  use(memberUpdate('last', 'age'), values('super', 110)))
+  use(memberUpdate('last', 'age'), value('super'), value(110)))
 
 specify('recordUpdateExplicitType',
   given({ first: 'grover', last: 'cleveland', age: 100 },
     shouldReturn({ first: 'grover', last: 'super', age: 110 })),
   use(
-    memberUpdate('last', 'age', recordType('first', 'last', 'age')),
-    values('super', 110)))
+    memberUpdate(
+      'last',
+      'age',
+      recordType(
+        takes(String, 'first'),
+        takes(String, 'last'),
+        takes(Number, 'age'))),
+    value('super'), value(110)))
 
 // Arrays
 specify('arrayLength',
@@ -253,7 +282,7 @@ specify('arrayLength',
 specify('arrayFilterEven',
   given([1, 2, 3, 4, 5, 6], shouldReturn([2, 4, 6])),
   use('Array.filter', '%', '===Number',
-    values(2, 0),
+    value(2), value(0),
     functionExpressions()))
 
 specify('arrayMapSquare',
@@ -279,66 +308,103 @@ specify('arraySum',
 
 // Maps
 specify('basicMapAccess',
-  given(asMap({ a: 1 }), 'a', shouldReturn(1)),
-  given(asMap({ a: 1 }), 'missing', shouldReturn(undefined)),
+  takes(mapType.of(Number)),
+  returns(unionType(Number, undefined)),
+  given({ a: 1 }, 'a', shouldReturn(1)),
+  given({ a: 1 }, 'missing', shouldReturn(undefined)),
   use('Map.get'))
 
 specify('inMap',
-  given(asMap({ a: 1 }), 'a', shouldReturn(true)),
-  given(asMap({ a: 1 }), 'b', shouldReturn(false)),
+  takes(mapType.of(Number)),
+  given({ a: 1 }, 'a', shouldReturn(true)),
+  given({ a: 1 }, 'b', shouldReturn(false)),
   use('in'))
 
 specify('unionMapAccess',
-  given(asMap({ a: 1 }), 'a', shouldReturn(1)),
-  given(asMap({ b: 'str' }), 'b', shouldReturn('str')),
-  given(asMap({ a: 1 }), 'missing', shouldReturn(undefined)),
+  takes(mapType.of(unionType(Number, String))),
+  returns(unionType(Number, String, undefined)),
+  given({ a: 1 }, 'a', shouldReturn(1)),
+  given({ b: 'str' }, 'b', shouldReturn('str')),
+  given({ a: 1 }, 'missing', shouldReturn(undefined)),
+  use('Map.get'))
+
+specify('unionMapAccessGeneric',
+  takes(mapType),
+  returns(unionType(typeParameter('a'), undefined)),
+  given({ a: 1 }, 'a', shouldReturn(1)),
+  given({ b: 'str' }, 'b', shouldReturn('str')),
+  given({ a: 1 }, 'missing', shouldReturn(undefined)),
   use('Map.get'))
 
 specify('unionWithUndefinedMapAccess',
-  given(asMap({ a: 1 }), 'a', shouldReturn(1)),
-  given(asMap({ b: undefined }), 'b', shouldReturn(undefined)),
-  given(asMap({ a: 1 }), 'missing', shouldReturn(undefined)),
+  takes(mapType.of(unionType(undefined, Number))),
+  returns(unionType(Number, undefined)),
+  given({ a: 1 }, 'a', shouldReturn(1)),
+  given({ b: undefined }, 'b', shouldReturn(undefined)),
+  given({ a: 1 }, 'missing', shouldReturn(undefined)),
+  use('OptionMap.get'))
+
+specify('unionWithUndefinedMapAccessGeneric',
+  takes(mapType),
+  returns(unionType(typeParameter('a'), undefined)),
+  given({ a: 1 }, 'a', shouldReturn(1)),
+  given({ b: undefined }, 'b', shouldReturn(undefined)),
+  given({ a: 1 }, 'missing', shouldReturn(undefined)),
   use('OptionMap.get'))
 
 specify('complexUnionWithUndefinedMapAccess',
-  given(asMap({ a: 1 }), 'a', shouldReturn(1)),
-  given(asMap({ b: 'str' }), 'b', shouldReturn('str')),
-  given(asMap({ c: undefined }), 'c', shouldReturn(undefined)),
-  given(asMap({ a: 1 }), 'missing', shouldReturn(undefined)),
+  takes(mapType.of(unionType(Number, String, undefined))),
+  returns(unionType(Number, String, undefined)),
+  given({ a: 1 }, 'a', shouldReturn(1)),
+  given({ b: 'str' }, 'b', shouldReturn('str')),
+  given({ c: undefined }, 'c', shouldReturn(undefined)),
+  given({ a: 1 }, 'missing', shouldReturn(undefined)),
+  use('OptionMap.get'))
+
+specify('complexUnionWithUndefinedMapAccessGeneric',
+  takes(mapType),
+  returns(unionType(typeParameter('a'), undefined)),
+  given({ a: 1 }, 'a', shouldReturn(1)),
+  given({ b: 'str' }, 'b', shouldReturn('str')),
+  given({ c: undefined }, 'c', shouldReturn(undefined)),
+  given({ a: 1 }, 'missing', shouldReturn(undefined)),
   use('OptionMap.get'))
 
 specify('keyLength',
-  given(asMap({ a: 1, b: 1, c: 1 }), shouldReturn(3)),
+  takes(mapType),
+  given({ a: 1, b: 1, c: 1 }, shouldReturn(3)),
   use('Array.length', 'Map.values'))
 
 specify('constructMapFromArray',
+  returns(mapType.of(String)),
   given([
     { key: 'a' },
     { key: 'b' }
-  ], shouldReturn(asMap({ a: 'a', b: 'b' }))),
+  ], shouldReturn({ a: 'a', b: 'b' })),
   use('ArrayToMap', 'Array.map', members(), functionExpressions()))
 
 specify('constructMapFromArrayAndIgnore',
+  returns(mapType.of(String)),
   given([
     { key: 'a' },
     { key: 'b' }
-  ], shouldReturn(asMap({ a: 'a', b: 'b' }))),
+  ], shouldReturn({ a: 'a', b: 'b' })),
   use('ArrayToMap', 'Array.map',
     member('key'),
     functionExpression(
-      takes(recordType('key')),
+      takes(recordType(takes(String, 'key'))),
       returns(String)),
     functionExpression(
       takes(String),
       returns(String))),
   ignore(
     functionType(
-      takes(recordType('key')),
-      returns(recordType('key')))))
+      takes(recordType(takes(String, 'key'))),
+      returns(recordType(takes(String, 'key'))))))
 
 specify('constructMapFromRecord',
-  given({ key: 'a' },
-    shouldReturn(asMap({ key: 'a' }))),
+  returns(mapType.of(String)),
+  given({ key: 'a' }, shouldReturn({ key: 'a' })),
   use('RecordToMap'))
 
 // Function types
@@ -380,23 +446,15 @@ specify('thunkCallWithExplicitFunction',
     functionExpression(returns(Number))))
 
 specify('caller',
-  given(2,
-    asFunctionOfType(
-      takes(Number),
-      returns(Number),
-      function double(x) { return x * 2 }),
-    shouldReturn(8)),
+  takes(Number),
+  takes(functionType(takes(Number), returns(Number))),
+  given(2, function double(x) { return x * 2 }, shouldReturn(8)),
   use(calls()))
 
 specify('callerExplicit',
-  given(2,
-    asFunctionOfType(
-      takes(Number),
-      returns(Number),
-      function double(x) {
-        return x * 2
-      }),
-    shouldReturn(8)),
+  takes(Number),
+  takes(functionType(takes(Number), returns(Number))),
+  given(2, function double(x) { return x * 2 }, shouldReturn(8)),
   use(call(takes(Number), returns(Number))))
 
 var return4 = specify('return4',
@@ -424,34 +482,49 @@ specify('specArgCallerExplicit',
   use(call(takes(Number), returns(Number))))
 
 specify('memberCaller',
+  takes(
+    recordType(
+      takes(Number, 'a'),
+      takes(Number, 'b'),
+      takes(functionType(returns(Number)), 'c'))),
   given({
     a: 1,
     b: 2,
-    c: asFunctionOfType(returns(Number), function() {
-      return this.a + this.b
-    })
+    c: function() { return this.a + this.b }
   }, shouldReturn(3)),
   use(memberCalls()))
 
 specify('memberCallerExplicit',
+  takes(
+    recordType(
+      takes(Number, 'a'),
+      takes(Number, 'b'),
+      takes(functionType(returns(Number)), 'c'))),
   given({
     a: 1,
     b: 2,
-    c: asFunctionOfType(returns(Number), function() {
-      return this.a + this.b
-    })
+    c: function() { return this.a + this.b }
   }, shouldReturn(3)),
   use(memberCall('c')))
 
 specify('memberCallerExplicitType',
+  takes(
+    recordType(
+      takes(Number, 'a'),
+      takes(Number, 'b'),
+      takes(functionType(returns(Number)), 'c'))),
   given({
     a: 1,
     b: 2,
-    c: asFunctionOfType(returns(Number), function() {
-      return this.a + this.b
-    })
+    c: function() { return this.a + this.b }
   }, shouldReturn(3)),
-  use(memberCall('c', recordType('a', 'b', 'c'))))
+  use(
+    memberCall(
+      'c',
+      recordType(
+        takes(Number, 'a'),
+        takes(Number, 'b'),
+        takes(functionType(returns(Number)), 'c')))))
 
 var callOverOne = specify('callOverOne',
   given(0, doubleIt, shouldReturn(1)),
@@ -492,28 +565,71 @@ specify('deepChainSpecs',
   given(3, shouldReturn(37)),
   use('+1', chainSpecs))
 
-specify('listReverse',
-  given(
-    null,
-    null,
-    shouldReturn(null)),
-  given(
-    { head: 1, tail: null },
-    null,
-    shouldReturn({ head: 1, tail: null })),
-  given(
-    { head: 2, tail: null },
-    { head: 1, tail: null },
-    shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
-  given(
-    { head: 1, tail: { head: 2, tail: null } },
-    null,
-    shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
-  use(
-    recursion(),
-    matches(),
-    members(),
-    objectCreates()))
+;(function() {
+
+  var listType = recordType()
+  listType.takes(Number, 'head')
+  listType.takes(unionType(null, listType), 'tail')
+
+  specify('listReverse',
+    takes(unionType(null, listType)),
+    takes(unionType(null, listType)),
+    returns(unionType(null, listType)),
+    given(
+      null,
+      null,
+      shouldReturn(null)),
+    given(
+      { head: 1, tail: null },
+      null,
+      shouldReturn({ head: 1, tail: null })),
+    given(
+      { head: 2, tail: null },
+      { head: 1, tail: null },
+      shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
+    given(
+      { head: 1, tail: { head: 2, tail: null } },
+      null,
+      shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
+    use(
+      recursion(),
+      matches(),
+      members(),
+      objectCreates()))
+})()
+
+;(function() {
+
+  var listType = recordType()
+  listType.takes(typeParameter('a'), 'head')
+  listType.takes(unionType(null, listType), 'tail')
+
+  specify('listReverseGeneric',
+    takes(unionType(null, listType)),
+    takes(unionType(null, listType)),
+    returns(unionType(null, listType)),
+    given(
+      null,
+      null,
+      shouldReturn(null)),
+    given(
+      { head: 1, tail: null },
+      null,
+      shouldReturn({ head: 1, tail: null })),
+    given(
+      { head: 2, tail: null },
+      { head: 1, tail: null },
+      shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
+    given(
+      { head: 1, tail: { head: 2, tail: null } },
+      null,
+      shouldReturn({ head: 2, tail: { head: 1, tail: null } })),
+    use(
+      recursion(),
+      matches(),
+      members(),
+      objectCreates()))
+})()
 
 specify('lifecycle',
   beforeAll(function() { this.str = '1' }),
@@ -532,18 +648,19 @@ specify('lifecycle',
   use('*'))
 
 specify('satisfaction',
-  when(
-    returns(Number),
-    given(1, shouldSatisfy(function(x) { return x === 2 })),
-    given(3, shouldSatisfy('double 3 should be 6', function(x) {
-      return x === 6
-    }))),
+  returns(Number),
+  given(1, shouldSatisfy(function(x) { return x === 2 })),
+  given(3, shouldSatisfy('double 3 should be 6', function(x) {
+    return x === 6
+  })),
   use('Number+'))
 
 specify('curry2',
-  when(
-    returns(functionType(takes(Number), returns(Number))),
-    given(adder, 1, shouldSatisfy(function(c) { return c(3) === 4 }))),
+  returns(
+    functionType(
+      takes(Number),
+      returns(Number))),
+  given(adder, 1, shouldSatisfy(function(c) { return c(3) === 4 })),
   use(
     functionExpression(
       takes(Number),
@@ -556,9 +673,8 @@ specify('createError',
   use('new Error'))
 
 specify('shouldThrow',
-  when(
-    returns(Number),
-    given(1, shouldThrow(function(err) { return err.message === '123' }))),
+  returns(Number),
+  given(1, shouldThrow(function(err) { return err.message === '123' })),
   use('throw', value('123')))
 
 specify('doTryCatchFinally',
@@ -567,7 +683,7 @@ specify('doTryCatchFinally',
     shouldReturn(4),
     mock('console.log', verify('cleanup'))),
   givenNoArgs(
-    shouldReturn(undefined),
+    shouldReturn(0),
     mock(return4, callback(function() { throw 123 })),
     mock('console.log', verify('cleanup'))),
   use(
@@ -575,20 +691,21 @@ specify('doTryCatchFinally',
     'tryCatchFinally',
     'console.log',
     functionExpressions(),
-    values(undefined, 'cleanup')))
+    value(0),
+    value('cleanup')))
 
 specify('doTryCatch',
   setOptions({ allowErrors: true }),
   givenNoArgs(
     shouldReturn(4)),
   givenNoArgs(
-    shouldReturn(undefined),
+    shouldReturn(0),
     mock(return4, callback(function() { throw 123 }))),
   use(
     return4,
     'tryCatch',
     functionExpressions(),
-    value(undefined)))
+    value(0)))
 
 specify('doTryFinally',
   setOptions({ allowErrors: true }),
@@ -652,34 +769,32 @@ specify('returnNot',
   use('Number+'))
 
 specify('satisfyNot',
-  when(returns(Number),
-    given(3, shouldNotSatisfy(function(x) { return x < 6 }))),
+  returns(Number),
+  given(3, shouldNotSatisfy(function(x) { return x < 6 })),
   use('Number+'))
 
 specify('throwNot',
-  when(returns(Number),
-    given(1,
-      shouldNotThrow(function(err) { return err.message === '555' }),
-      as('not throw 555'))),
+  returns(Number),
+  given(1,
+    shouldNotThrow(function(err) { return err.message === '555' }),
+    as('not throw 555')),
   use('throw', value('123')))
 
 // TypeParameter functions
 specify('genericFn',
-  when(
-    takes(typeParameter('a')),
-    returns(recordType(
-      takes(typeParameter('a'), 'lhs'),
-      takes(typeParameter('a'), 'rhs'))),
-    given(1, shouldReturn({ lhs: 1, rhs: 1 }))),
+  takes(typeParameter('a')),
+  returns(recordType(
+    takes(typeParameter('a'), 'lhs'),
+    takes(typeParameter('a'), 'rhs'))),
+  given(1, shouldReturn({ lhs: 1, rhs: 1 })),
   use(objectCreates()))
 
 specify('conditionalSlice',
-  when(
-    takes(Array),
-    takes(Boolean),
-    returns(Array),
-    given([1, 2, 3], true, shouldReturn([1, 2, 3])),
-    given([1, 2, 3], false, shouldReturn([]))),
+  takes(Array),
+  takes(Boolean),
+  returns(Array),
+  given([1, 2, 3], true, shouldReturn([1, 2, 3])),
+  given([1, 2, 3], false, shouldReturn([])),
   use('?:', value([])))
 
 specify('mockConsoleLog',
@@ -734,25 +849,24 @@ specify('mockGetTimeWithMockEach',
     as('$.get(@url, @fn)'))
 
   return specify('mockAjaxGet',
-    when(
-      returns(Deferred),
-      given('url/of/resource/to/get',
-        mock(jQueryGetString,
-          callback(function callItBack(url, callbackFn) {
-            callbackFn('contents')
-            return Deferred.instantiate()
-          }),
-          verify('url/of/resource/to/get')),
-        mock('console.logString',
-          verify('contents'))),
-      given('url/of/resource/to/get',
-        mock(jQueryGetString,
-          callback(function noCallback() {
-            return Deferred.instantiate()
-          }),
-          verify('url/of/resource/to/get')),
-        mock('console.logString',
-          verifyNotCalled()))),
+    returns(Deferred),
+    given('url/of/resource/to/get',
+      mock(jQueryGetString,
+        callback(function callItBack(url, callbackFn) {
+          callbackFn('contents')
+          return Deferred.instantiate()
+        }),
+        verify('url/of/resource/to/get')),
+      mock('console.logString',
+        verify('contents'))),
+    given('url/of/resource/to/get',
+      mock(jQueryGetString,
+        callback(function noCallback() {
+          return Deferred.instantiate()
+        }),
+        verify('url/of/resource/to/get')),
+      mock('console.logString',
+        verifyNotCalled())),
     use(jQueryGetString, 'console.logString', functionExpressions()))
 })()
 
@@ -762,7 +876,10 @@ specify('mockGetTimeWithMockEach',
 
   var onClick = isolate('onClick',
     takes(String),
-    takes(functionType(takes(eventType), returns(undefined)), '@fn'),
+    takes(
+      functionType(
+        takes(eventType),
+        returns(undefined)), '@fn'),
     returns(undefined),
     as('$(@String).on("click", @fn)'))
 
@@ -777,7 +894,7 @@ specify('mockGetTimeWithMockEach',
     use('console.logString',
       onClick,
       functionExpressions(),
-      values('#btn', 'click')))
+      value('#btn'), value('click')))
 })()
 
 ;(function mockAddCssClass() {
@@ -893,52 +1010,63 @@ specify('callParamOnlyThisSpec',
   given(2, { a: 1 }, specifyThis, shouldReturn(3)),
   use(calls()))
 
-specify('thisMatchArgAndDouble',
-  given(4, context({ a: 1 }), shouldReturn(5)),
-  given('a', context({ a: 1 }), shouldReturn(1)),
-  use('Number+', matchArguments(), members()))
+specifyMatch('thisMatchArgAndDouble',
+  specify('addNumberArgToContext',
+    given(4, context({ a: 1 }), shouldReturn(5)),
+    use('Number+', members())),
+  specify('ignoreStringArgAndReturnContext',
+    given('a', context({ a: 1 }), shouldReturn(1)),
+    use(members())))
 
-specify('thisMatchThisAndDouble',
-  given('b', context('a'), shouldReturn('ba')),
-  given('b', context(4), shouldReturn(null)),
-  given(5, context(4), shouldReturn(9)),
-  given(5, context('a'), shouldReturn(null)),
-  use('Number+', 'String+', matchArguments(), value(null)))
+specifyMatch('thisMatchThisAndDouble',
+  specify('addStringToContextString',
+    given('b', context('a'), shouldReturn('ba')),
+    use('String+')),
+  specify('returnNullFromStringAndNumberContext',
+    given('b', context(4), shouldReturn(null)),
+    use(value(null))),
+  specify('addNumberToContextNumber',
+    given(5, context(4), shouldReturn(9)),
+    use('Number+')),
+  specify('returnNullFromNumberAndStringContext',
+    given(5, context('a'), shouldReturn(null)),
+    use(value(null))))
 
-specify('memberThisCaller',
-  given({
-    a: 1,
-    b: 2,
-    c: asFunctionOfType(
-      takesContext(recordType('a', 'b', 'c')),
-      returns(Number),
-      function() {
-        return this.a + this.b
-      })
-  }, shouldReturn(3)),
-  use(calls(), member('c')))
+;(function() {
 
-specify('memberThisCallerExplicit',
-  given({
-    a: 1,
-    b: 2,
-    c: asFunctionOfType(
-      takesContext(recordType('a', 'b', 'c')),
-      returns(Number),
-      function() {
-        return this.a + this.b
-      })
-  }, shouldReturn(3)),
-  use(
-    call(
-      takesContext(recordType('a', 'b', 'c')),
-      returns(Number)),
-    member('c')))
+  var rec = recordType()
+  rec.takes(Number, 'a')
+  rec.takes(Number, 'b')
+  rec.takes(functionType(takesContext(rec), returns(Number)), 'c')
+
+  specify('memberThisCaller',
+    takes(rec),
+    given({
+      a: 1,
+      b: 2,
+      c: function() { return this.a + this.b }
+    }, shouldReturn(3)),
+    use(calls(), member('c')))
+
+  specify('memberThisCallerExplicit',
+    takes(rec),
+    given({
+      a: 1,
+      b: 2,
+      c: function() { return this.a + this.b }
+    }, shouldReturn(3)),
+    use(
+      call(
+        takesContext(rec),
+        returns(Number)),
+      member('c')))
+})()
 
 specify('arrayFilterEvenThis',
   givenNoArgs(context([1, 2, 3, 4, 5, 6]), shouldReturn([2, 4, 6])),
   use('Array.filter', '%', '===Number',
-    values(2, 0),
+    value(2),
+    value(0),
     functionExpressions()))
 
 specify('arrayFilterEvenThisExplicit',
@@ -954,7 +1082,8 @@ specify('arrayFilterEvenThisExplicit',
         '@fn'),
       returns(arrayType.of(Number)),
       as('@array.filter(@fn)')),
-    values(2, 0),
+    value(2),
+    value(0),
     functionExpression(
       takesContext(arrayType.of(Number)),
       takes(Number),
@@ -1049,10 +1178,9 @@ specify('mockPerson',
   use(Person))
 
 specify('simpleInheritance',
-  when(
-    returns(Person),
-    given('g', 'w', 2,
-      shouldReturn(Employee.instantiate({ first: 'g', last: 'w', pay: 2 })))),
+  returns(Person),
+  given('g', 'w', 2,
+    shouldReturn(Employee.instantiate({ first: 'g', last: 'w', pay: 2 }))),
   use(Employee))
 
 var mockConsoleLogNumber = specify('mockConsoleLogNumber',
@@ -1085,7 +1213,7 @@ specify('nativeFnCtorInstantiated',
   given(
     recordType(
       takes(String, 'message'),
-      forConstructor((function NativeCtorTestFn() { }))).
+      forConstructor(function NativeCtorTestFn() { })).
       instantiate({ message: 'abc' }),
     shouldReturn('abc')),
   use(members()))
@@ -1143,14 +1271,13 @@ specify('nativeExpressionWithRequirementsCaller',
 var celsiusNumberToFarenheitNumber = specify('celsiusNumberToFarenheitNumber',
   given(100, shouldReturn(212)),
   given(0, shouldReturn(32)),
-  use('*', 'Number+', values(9 / 5, 32)))
+  use('*', 'Number+', value(9 / 5), value(32)))
 
 specify('celsiusToFarenheit',
-  when(
-    takes(celsius),
-    returns(farenheit),
-    given(100, shouldReturn(212)),
-    given(0, shouldReturn(32))),
+  takes(celsius),
+  returns(farenheit),
+  given(100, shouldReturn(212)),
+  given(0, shouldReturn(32)),
   use(
     celsiusNumberToFarenheitNumber,
     celsius.convertFrom,
@@ -1159,23 +1286,21 @@ specify('celsiusToFarenheit',
 var farenheitNumberToCelsiusNumber = specify('farenheitNumberToCelsiusNumber',
   given(212, shouldReturn(100)),
   given(32, shouldReturn(0)),
-  use('*', '-', values(5 / 9, 32)))
+  use('*', '-', value(5 / 9), value(32)))
 
 specify('farenheitToCelsius',
-  when(
-    takes(farenheit),
-    returns(celsius),
-    given(212, shouldReturn(100)),
-    given(32, shouldReturn(0))),
+  takes(farenheit),
+  returns(celsius),
+  given(212, shouldReturn(100)),
+  given(32, shouldReturn(0)),
   use(
     farenheitNumberToCelsiusNumber,
     farenheit.convertFrom,
     celsius.convertTo))
 
 specify('getCelsiusConstant',
-  when(
-    returns(celsius),
-    givenNoArgs(shouldReturn(33))),
+  returns(celsius),
+  givenNoArgs(shouldReturn(33)),
   use(
     express('celsius33',
       returns(celsius),
@@ -1187,20 +1312,16 @@ specify('getCelsiusConstant',
   recGraphType.takes(farenheit, 'head')
   recGraphType.takes(unionType(null, recGraphType), 'tail')
   return specify('recursiveTemperatureRecord',
-    when(
-      takes(recGraphType),
-      returns(farenheit),
-      given({ head: 1, tail: null }, shouldReturn(1)),
-      given({ head: 1, tail: { head: 2, tail: null } }, shouldReturn(1))),
+    takes(recGraphType),
+    returns(farenheit),
+    given({ head: 1, tail: null }, shouldReturn(1)),
+    given({ head: 1, tail: { head: 2, tail: null } }, shouldReturn(1)),
     use(member('head')))
 })()
 
 var recordCompat1 = specify('recordCompat1',
-  givenNoArgs(
-    shouldReturn({ a: 1 })),
-  use(
-    objectCreates(),
-    value(1)))
+  givenNoArgs(shouldReturn({ a: 1 })),
+  use(objectCreates(), value(1)))
 
 specify('recordCompat2',
   givenNoArgs(
@@ -1215,11 +1336,10 @@ specify('recordCompat3',
 */
 
 specify('argumentsAsArray',
-  when(
-    takes(argumentsObjectType),
-    returns(Array),
-    given(asArguments([1, 2, 3]), shouldReturn([1, 2]))),
-  use('Array.slice2', 'Array.fromArguments', values(0, 2)))
+  takes(argumentsObjectType),
+  returns(Array),
+  given(asArguments([1, 2, 3]), shouldReturn([1, 2])),
+  use('Array.slice2', 'Array.fromArguments', value(0), value(2)))
 
 specify('hypotenuse',
   given(3,  4, shouldReturn(5)),
@@ -1227,5 +1347,19 @@ specify('hypotenuse',
   given(7, 24, shouldReturn(25)),
   given(8, 15, shouldReturn(17)),
   use('*', 'Number+', 'Math.sqrt'))
+
+specifyConstructor('UnionConstructor',
+  takes(unionType(Number, String)),
+  returnsRecordThat(
+    takes(unionType(Number, String), 'value')),
+  given(33, shouldReturn({ value: 33 })),
+  given('hello', shouldReturn({ value: 'hello' })))
+
+specifyConstructor('ParameterizedConstructor',
+  takes(typeParameter('a')),
+  returnsRecordThat(
+    takes(typeParameter('a'), 'value')),
+  given(33, shouldReturn({ value: 33 })),
+  given('hello', shouldReturn({ value: 'hello' })))
 
 tap.log(globalOptions.maxAstNodes === 20, 'globalOptions.maxAstNodes === 20')

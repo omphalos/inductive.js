@@ -18,6 +18,7 @@ var inductive = require('../lib/inductive.js')
   , recordType = inductive.recordType
   , unionType = inductive.unionType
   , argumentsObjectType = inductive.argumentsObjectType
+  , smallType = inductive.smallType
 
 /////////////////////////////////
 // Test typeParameter subset checks. //
@@ -152,6 +153,14 @@ testTypeContains(true,
   functionType(takes(Number), returns(String)),
   functionType(takes(pa), returns(String)))
 
+// Recursive record strings
+var infinite = recordType(takes(Number, 'current'))
+infinite.takes(infinite, 'next')
+var infiniteString = '{ Object current: Number, next: <Circular$0> }'
+tap.log(
+  infinite.toString() === infiniteString,
+  'Expect infinite type to be ' + infiniteString)
+
 //////////////////////////////////////////
 // Test unions containing other unions. //
 //////////////////////////////////////////
@@ -198,49 +207,6 @@ testUnionContains(undefinedType,
   unionType(undefinedType, typeParameter('a')),
   { a: undefinedType })
 
-////////////////////////
-// Test adding types. //
-////////////////////////
-
-function testUnion() {
-
-  function resolve(x) { return typeUtil.resolveType(x, {}) }
-
-  var args = [].slice.apply(arguments).map(resolve)
-    , inferArgs = args.slice(1)
-    , recs = {}
-    , types = inferArgs.map(function(it) {
-      return typeUtil.addTypes([it], recs)
-    })
-  var argString = '(' + types.join(' | ') + ')'
-    , expectation = typeUtil.addTypes([args[0]], recs)
-    , actual = typeUtil.addTypes(types, recs)
-    , equals = expectation.equals(actual)
-
-  tap.log(
-    equals,
-    argString + ' === ' + expectation,
-    equals ? '' : '# actual: ' + actual.toString())
-}
-
-testUnion(unionType(Number, Boolean), Number, Boolean)
-testUnion(Number, Number)
-testUnion(Number, Number, Number)
-testUnion(pa, Number, pa)
-testUnion(unionType(Number, Boolean, String), Number, Boolean, String)
-testUnion(argumentsType(Number, Boolean),
-  argumentsType(Number, Boolean),
-  argumentsType(Number, Boolean))
-testUnion(unionType(Boolean, String, Number),
-  Number,
-  unionType(Boolean, String))
-testUnion(unionType(Number, Boolean, String),
-  unionType(Number, Boolean),
-  unionType(Boolean, String))
-testUnion(unionType(Number, Boolean),
-  unionType(Number, Boolean),
-  unionType(Number, Boolean))
-
 function disallowUnion(lhs, rhs) {
   var recs = {}
   lhs = typeUtil.resolveType(lhs, recs)
@@ -265,3 +231,95 @@ disallowUnion(superType, subType)
 disallowUnion(
   functionType(takes(Number), returns(Number)),
   functionType(takes(String), returns(Boolean)))
+
+function verifyInstantiation(expected, type, obj) {
+  var resolvedType = typeUtil.resolveType(type, {})
+    , typeFilters = {}
+    , errors = resolvedType.getInstanceError(obj, typeFilters)
+    , allows = !errors.length
+    , verb = expected ? 'allow' : 'disallow'
+    , ok = expected === allows
+  tap.log(ok,
+    'should ' + verb +
+    ' instantiation of ' + JSON.stringify(obj) +
+    ' in ' + resolvedType)
+  if(ok) return
+  errors.forEach(function(err) { tap.comment('  ' + err) })
+  var typeFilterKeys = Object.keys(typeFilters)
+  tap.comment('typeFilters (' + typeFilterKeys.length + ')')
+  typeFilterKeys.forEach(function(key) {
+    tap.comment('  ' + key + ': ' + typeFilters[key])
+  })
+}
+
+var allowInstantiation = verifyInstantiation.bind(null, true)
+  , disallowInstantiation = verifyInstantiation.bind(null, false)
+
+// primitives
+allowInstantiation(String, 'abc')
+disallowInstantiation(String, 3)
+allowInstantiation(Number, 3)
+disallowInstantiation(Number, null)
+allowInstantiation(Boolean, true)
+disallowInstantiation(Boolean, 'x')
+allowInstantiation(null, null)
+disallowInstantiation(null, undefined)
+allowInstantiation(undefined, undefined)
+disallowInstantiation(undefined, null)
+
+// native objects
+allowInstantiation(Date, new Date())
+disallowInstantiation(Date, 'x')
+allowInstantiation(Error, new Error())
+disallowInstantiation(Error, new Date())
+allowInstantiation(RegExp, /a/)
+disallowInstantiation(RegExp, 3)
+
+// parameterized native objects
+allowInstantiation(argumentsObjectType, typeUtil.asArguments([1, 2, 3]))
+disallowInstantiation(argumentsObjectType, [1, 2, 3])
+allowInstantiation(Array, [1, 2, 3])
+disallowInstantiation(Array, {})
+allowInstantiation(arrayType.of(String), [])
+allowInstantiation(arrayType.of(String), ['a', 'b'])
+disallowInstantiation(arrayType.of(String), [1, 2])
+allowInstantiation(mapType, { a: 1 })
+disallowInstantiation(mapType, [1, 2, 3])
+allowInstantiation(mapType, { a: 'x' })
+disallowInstantiation(mapType, null)
+allowInstantiation(mapType.of(String), { a: 'x' })
+allowInstantiation(mapType.of(undefined), { a: undefined })
+disallowInstantiation(mapType.of(Number), { a: 'x' })
+
+// unions
+allowInstantiation(unionType(String, Number), 'x')
+disallowInstantiation(unionType(Number, undefined), 'x')
+
+// union parameters
+allowInstantiation(arrayType.of(unionType(String, Number)), ['a', 1])
+disallowInstantiation(arrayType.of(unionType(String, Number)), ['a', null])
+
+// functions
+allowInstantiation(functionType(takes(String), returns(Number)), function() {})
+disallowInstantiation(functionType(takes(String), returns(Number)), undefined)
+
+// records
+var numStrRecord = recordType(takes(Number, 'a'), takes(String, 'b'))
+allowInstantiation(numStrRecord, { a: 1, b: 'x' })
+disallowInstantiation(numStrRecord, { a: 1, b: 3 })
+
+// small types
+allowInstantiation(smallType('Celsius', Number), 3)
+disallowInstantiation(smallType('Celsius', Number), 'x')
+
+// type parameters
+allowInstantiation(unionType(typeParameter('a'), Number), 3)
+allowInstantiation(unionType(typeParameter('a'), Number), 'x')
+
+var aabRecord = recordType(
+  takes(typeParameter('a'), 'a0'),
+  takes(typeParameter('a'), 'a1'),
+  takes(typeParameter('b'), 'b0'))
+allowInstantiation(aabRecord, { a0: 1, a1: 2, b0: 'x' })
+disallowInstantiation(aabRecord, { a0: 1, a1: 'x', b0: 'x' })
+
