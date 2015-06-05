@@ -6,7 +6,7 @@ var inductive = require('../lib/inductive.js')
   , functionType = inductive.functionType
   , takes = inductive.takes
   , returns = inductive.returns
-  , argumentsType = inductive.argumentsType
+  , argumentsTupleType = inductive.argumentsTupleType
   , parameterizedType = inductive.parameterizedType
   , mapType = inductive.mapType
   , arrayType = inductive.arrayType
@@ -73,47 +73,47 @@ testTypeContains(true,
 testTypeContains(false,
   functionType(takes(a), returns(b)),
   functionType(takes(a), returns(a)))
-testTypeContains(true, argumentsType(a, b), argumentsType(a, b))
-testTypeContains(false, argumentsType(a, b), argumentsType(a, c))
-testTypeContains(false, argumentsType(a, b), argumentsType(a, b, b))
-testTypeContains(true, argumentsType(pa, pb), argumentsType(pc, pc))
+testTypeContains(true, argumentsTupleType(a, b), argumentsTupleType(a, b))
+testTypeContains(false, argumentsTupleType(a, b), argumentsTupleType(a, c))
+testTypeContains(false, argumentsTupleType(a, b), argumentsTupleType(a, b, b))
+testTypeContains(true, argumentsTupleType(pa, pb), argumentsTupleType(pc, pc))
 testTypeContains(true, unionType(a, b), unionType(a, b))
 testTypeContains(false, unionType(a, b), unionType(a, c))
 testTypeContains(false, unionType(a, b), unionType(a, b, c))
-testTypeContains(false, unionType(a, b), argumentsType(a, b))
-testTypeContains(false, argumentsType(a, b), unionType(a, b))
+testTypeContains(false, unionType(a, b), argumentsTupleType(a, b))
+testTypeContains(false, argumentsTupleType(a, b), unionType(a, b))
 testTypeContains(true, parameterizedType(pa, 'a'), parameterizedType(pa, 'a'))
 testTypeContains(false,
   parameterizedType(pa, 'a'),
   parameterizedType(pa, pb, 'a'))
 testTypeContains(false, parameterizedType(pa, 'a'), parameterizedType(pa, 'b'))
 testTypeContains(true,
-  argumentsType(pa, pb, pc),
-  argumentsType(pd, pe, pf))
+  argumentsTupleType(pa, pb, pc),
+  argumentsTupleType(pd, pe, pf))
 testTypeContains(true,
-  argumentsType(pa, pa, pb),
-  argumentsType(pc, pc, pd))
+  argumentsTupleType(pa, pa, pb),
+  argumentsTupleType(pc, pc, pd))
 testTypeContains(false,
-  argumentsType(pa, pb, pb),
-  argumentsType(pc, pc, pd))
+  argumentsTupleType(pa, pb, pb),
+  argumentsTupleType(pc, pc, pd))
 testTypeContains(false,
-  argumentsType(pa, a, pb),
-  argumentsType(pc, pd, pe))
+  argumentsTupleType(pa, a, pb),
+  argumentsTupleType(pc, pd, pe))
 testTypeContains(true,
-  argumentsType(pc, pd, pe),
-  argumentsType(pa, a, pb))
+  argumentsTupleType(pc, pd, pe),
+  argumentsTupleType(pa, a, pb))
 testTypeContains(true,
-  argumentsType(pa, pa, pb),
-  argumentsType(pa, pa, pc))
+  argumentsTupleType(pa, pa, pb),
+  argumentsTupleType(pa, pa, pc))
 testTypeContains(false,
-  argumentsType(pa, pb, pb),
-  argumentsType(pa, pa, pb))
+  argumentsTupleType(pa, pb, pb),
+  argumentsTupleType(pa, pa, pb))
 testTypeContains(true,
-  argumentsType(typeParameter('a'), typeParameter('a'), typeParameter('b')),
-  argumentsType(typeParameter('a'), typeParameter('a'), typeParameter('c')))
+  argumentsTupleType(typeParameter('a'), typeParameter('a'), typeParameter('b')),
+  argumentsTupleType(typeParameter('a'), typeParameter('a'), typeParameter('c')))
 testTypeContains(false,
-  argumentsType(typeParameter('a'), typeParameter('b'), typeParameter('b')),
-  argumentsType(typeParameter('a'), typeParameter('a'), typeParameter('b')))
+  argumentsTupleType(typeParameter('a'), typeParameter('b'), typeParameter('b')),
+  argumentsTupleType(typeParameter('a'), typeParameter('a'), typeParameter('b')))
 testTypeContains(true, parameterizedType(pb, 'a'), parameterizedType(c, 'a'))
 testTypeContains(true,
   recordType(takes(Number, 'a')),
