@@ -305,7 +305,7 @@ disallowInstantiation(aabRecord, { a0: 1, a1: 'x', b0: 'x' })
 function verifyInstantiation(expected, type, obj) {
   var resolvedType = typeUtil.resolveType(type)
     , typeFilters = {}
-    , errors = resolvedType.getInstanceError(obj, typeFilters)
+    , errors = resolvedType.validateInstance(obj, typeFilters)
     , allows = !errors.length
     , verb = expected ? 'allow' : 'disallow'
     , ok = expected === allows
