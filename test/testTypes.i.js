@@ -47,18 +47,6 @@ numberTree.takes(Number, 'value')
 numberTree.takes(unionType(numberTree, null), 'lhs')
 numberTree.takes(unionType(numberTree, null), 'rhs')
 
-function testTypeContains(expect, x, y) {
-  var recs = {}
-  x = typeUtil.resolveType(x, {})
-  y = typeUtil.resolveType(y, {})
-  var matches = x.containsType(y, {})
-  tap.log(
-    !!expect === !!matches,
-    x.toString(),
-    expect ? '>=' : '>/=', 
-    y.toString())
-}
-
 /* testTypeContains(true,
   unionType(argumentsArrayType, arrayType),
   unionType(argumentsArrayType.of(Number), arrayType)) */
@@ -153,6 +141,18 @@ testTypeContains(true,
   functionType(takes(Number), returns(String)),
   functionType(takes(pa), returns(String)))
 
+function testTypeContains(expect, x, y) {
+  var recs = {}
+  x = typeUtil.resolveType(x, {})
+  y = typeUtil.resolveType(y, {})
+  var matches = x.containsType(y, {})
+  tap.log(
+    !!expect === !!matches,
+    x.toString(),
+    expect ? '>=' : '>/=', 
+    y.toString())
+}
+
 // Recursive record strings
 var infinite = recordType(takes(Number, 'current'))
 infinite.takes(infinite, 'next')
@@ -164,6 +164,19 @@ tap.log(
 //////////////////////////////////////////
 // Test unions containing other unions. //
 //////////////////////////////////////////
+
+testUnionContains(
+  unionType(Number, typeParameter('a')),
+  unionType(Number, typeParameter('a')), {})
+testUnionContains(unionType(undefinedType, Number, String),
+  unionType(undefinedType, typeParameter('a')),
+  { a: unionType(Number, String) })
+testUnionContains(unionType(undefinedType, String),
+  unionType(undefinedType, typeParameter('a')),
+  { a: unionType(undefinedType, String) })
+testUnionContains(undefinedType,
+  unionType(undefinedType, typeParameter('a')),
+  { a: undefinedType })
 
 function testUnionContains(expected, genericUnion, typeFilters) {
   expected = typeUtil.resolveType(expected, {})
@@ -194,18 +207,12 @@ function testUnionContains(expected, genericUnion, typeFilters) {
     expected)
 }
 
-testUnionContains(
-  unionType(Number, typeParameter('a')),
-  unionType(Number, typeParameter('a')), {})
-testUnionContains(unionType(undefinedType, Number, String),
-  unionType(undefinedType, typeParameter('a')),
-  { a: unionType(Number, String) })
-testUnionContains(unionType(undefinedType, String),
-  unionType(undefinedType, typeParameter('a')),
-  { a: unionType(undefinedType, String) })
-testUnionContains(undefinedType,
-  unionType(undefinedType, typeParameter('a')),
-  { a: undefinedType })
+var superType = recordType(forConstructor('Super'))
+  , subType = recordType(forConstructor('Sub', superType.ctor))
+disallowUnion(superType, subType)
+disallowUnion(
+  functionType(takes(Number), returns(Number)),
+  functionType(takes(String), returns(Boolean)))
 
 function disallowUnion(lhs, rhs) {
   var recs = {}
@@ -223,33 +230,6 @@ function disallowUnion(lhs, rhs) {
       'should not unite', '(' + lhs.toString() + ')',
       'with', '(' + rhs.toString() + ')')
   }
-}
-
-var superType = recordType(forConstructor('Super'))
-  , subType = recordType(forConstructor('Sub', superType.ctor))
-disallowUnion(superType, subType)
-disallowUnion(
-  functionType(takes(Number), returns(Number)),
-  functionType(takes(String), returns(Boolean)))
-
-function verifyInstantiation(expected, type, obj) {
-  var resolvedType = typeUtil.resolveType(type, {})
-    , typeFilters = {}
-    , errors = resolvedType.getInstanceError(obj, typeFilters)
-    , allows = !errors.length
-    , verb = expected ? 'allow' : 'disallow'
-    , ok = expected === allows
-  tap.log(ok,
-    'should ' + verb +
-    ' instantiation of ' + JSON.stringify(obj) +
-    ' in ' + resolvedType)
-  if(ok) return
-  errors.forEach(function(err) { tap.comment('  ' + err) })
-  var typeFilterKeys = Object.keys(typeFilters)
-  tap.comment('typeFilters (' + typeFilterKeys.length + ')')
-  typeFilterKeys.forEach(function(key) {
-    tap.comment('  ' + key + ': ' + typeFilters[key])
-  })
 }
 
 var allowInstantiation = verifyInstantiation.bind(null, true)
@@ -323,3 +303,22 @@ var aabRecord = recordType(
 allowInstantiation(aabRecord, { a0: 1, a1: 2, b0: 'x' })
 disallowInstantiation(aabRecord, { a0: 1, a1: 'x', b0: 'x' })
 
+function verifyInstantiation(expected, type, obj) {
+  var resolvedType = typeUtil.resolveType(type, {})
+    , typeFilters = {}
+    , errors = resolvedType.getInstanceError(obj, typeFilters)
+    , allows = !errors.length
+    , verb = expected ? 'allow' : 'disallow'
+    , ok = expected === allows
+  tap.log(ok,
+    'should ' + verb +
+    ' instantiation of ' + JSON.stringify(obj) +
+    ' in ' + resolvedType)
+  if(ok) return
+  errors.forEach(function(err) { tap.comment('  ' + err) })
+  var typeFilterKeys = Object.keys(typeFilters)
+  tap.comment('typeFilters (' + typeFilterKeys.length + ')')
+  typeFilterKeys.forEach(function(key) {
+    tap.comment('  ' + key + ': ' + typeFilters[key])
+  })
+}
