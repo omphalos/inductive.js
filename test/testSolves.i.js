@@ -1306,6 +1306,11 @@ specify('getCelsiusConstant',
       returns(celsius),
       as('33'))))
 
+specify('celsiusComparand',
+  returns(celsius),
+  givenNoArgs(shouldReturn['>='](50)),
+  use(value(100, celsius)))
+
 ;(function() {
   // Test recursive object graph with small types.
   var recGraphType = recordType()
