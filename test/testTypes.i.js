@@ -143,8 +143,8 @@ testTypeContains(true,
 
 function testTypeContains(expect, x, y) {
   var recs = {}
-  x = typeUtil.resolveType(x, {})
-  y = typeUtil.resolveType(y, {})
+  x = typeUtil.resolveType(x)
+  y = typeUtil.resolveType(y)
   var matches = x.containsType(y, {})
   tap.log(
     !!expect === !!matches,
@@ -179,10 +179,10 @@ testUnionContains(undefinedType,
   { a: undefinedType })
 
 function testUnionContains(expected, genericUnion, typeFilters) {
-  expected = typeUtil.resolveType(expected, {})
-  genericUnion = typeUtil.resolveType(genericUnion, {})
+  expected = typeUtil.resolveType(expected)
+  genericUnion = typeUtil.resolveType(genericUnion)
   Object.keys(typeFilters).forEach(function(key) {
-    typeFilters[key] = typeUtil.resolveType(typeFilters[key], {})
+    typeFilters[key] = typeUtil.resolveType(typeFilters[key])
   })
   var filteredType = genericUnion.filterType(typeFilters)
     , filterObj = {}
@@ -215,9 +215,8 @@ disallowUnion(
   functionType(takes(String), returns(Boolean)))
 
 function disallowUnion(lhs, rhs) {
-  var recs = {}
-  lhs = typeUtil.resolveType(lhs, recs)
-  rhs = typeUtil.resolveType(rhs, recs)
+  lhs = typeUtil.resolveType(lhs)
+  rhs = typeUtil.resolveType(rhs)
   try {
     unionType(lhs, rhs)
     tap.log(false,
@@ -304,7 +303,7 @@ allowInstantiation(aabRecord, { a0: 1, a1: 2, b0: 'x' })
 disallowInstantiation(aabRecord, { a0: 1, a1: 'x', b0: 'x' })
 
 function verifyInstantiation(expected, type, obj) {
-  var resolvedType = typeUtil.resolveType(type, {})
+  var resolvedType = typeUtil.resolveType(type)
     , typeFilters = {}
     , errors = resolvedType.getInstanceError(obj, typeFilters)
     , allows = !errors.length
