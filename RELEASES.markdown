@@ -29,7 +29,6 @@ Release History
 * Remove `UnionType.prototype.add`.
 * Validate to prevent primitive objects (such as `new Number(3)`).
 
-
 Versioning
 ==========
 
