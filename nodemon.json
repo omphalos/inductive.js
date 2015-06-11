@@ -9,6 +9,7 @@
     "examples/underscore/underscore.js",
     "examples/ajax/ajax.js",
     "examples/helloworld/helloworld.js",
+    "examples/multiindex/Index.js",
     ".inductive.cache.json",
     "todo"
   ],

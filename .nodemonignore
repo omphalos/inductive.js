@@ -7,5 +7,6 @@ test/project-actual/lib/childSiblingComponent.js
 examples/underscore/underscore.js
 examples/ajax/ajax.js
 examples/helloworld/helloworld.js
+examples/multiindex/Index.js
 .inductive.cache.json
 todo

@@ -1,1 +1,1 @@
-nodemon ./test/test.i.js ./inductive.js | egrep "not ok|$"
+nodemon ./test/test.i.js
