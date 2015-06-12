@@ -2,7 +2,7 @@
 
 require('../../lib/inductive.js').globals()
 
-require('./BinaryTree.i.js')
+require('./BinaryTree.i.js')  
 
 function nameSelector(address) {
   return address.name
