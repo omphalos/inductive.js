@@ -12,3 +12,8 @@ function Index(arg0, arg1, arg2) {
   this['name'] = arg0;
   this['selector'] = arg1;
 }
+
+function addIndex(arg1) {
+  var arg0 = this;
+  return arg0;
+}

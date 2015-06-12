@@ -2,14 +2,16 @@
 
 require('../../lib/inductive.js').globals()
 
+require('./BinaryTree.i.js')
+
 function nameSelector(address) {
   return address.name
 }
 
-var element = typeParameter('element')
+var elementType = typeParameter('element')
 
 var selectorType = functionType(
-  takes(element),
+  takes(elementType),
   returns(String))
 
 var addressType = recordType(
@@ -28,8 +30,8 @@ var Index = specifyConstructor('Index',
     takes(String, 'name'),
     takes(selectorType, 'selector'),
     takes(String, 'idProperty'),
-    takes(mapType.of(element), 'keyMap'),
-    takes(mapType.of(element), 'idMap')),
+    takes(mapType.of(elementType), 'keyMap'),
+    takes(mapType.of(elementType), 'idMap')),
 
   given('addresses', nameSelector, 'uuid',
     shouldReturn({
@@ -52,21 +54,22 @@ var Index = specifyConstructor('Index',
   use(
     matches(),
     value('id'),
-    value({}, mapType.of(element))))
-/*
+    value({}, mapType.of(elementType))))
+
+var addressIndex = Index.instantiate({
+  name: 'addresses',
+  selector: nameSelector
+})
+
 specify('addIndex',
 
   takesContext(Index),
-  takes(typeParameter('a')),
+  takes(elementType),
 
   returns(Index),
 
-  given(Index.of(String, addressType).instantiate({
-    name: 'addresses',
-    selector: nameSelector
-  }), returns(Index.of(addressType))))
-*/
-// protoMember(Index, add)
+  given(context(addressIndex), { name: 'abc', id: 0 },
+    shouldReturn(addressIndex)))
 
 saveAll()
 
