@@ -1,7 +1,7 @@
 inductive.js
 ============
 
-This is an experimental library which uses unit test
+This is an experimental library which uses unit tests
 to autogenerate working code.
 
 Example:
