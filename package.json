@@ -4,7 +4,7 @@
   "description": "Inductive programming for JavaScript",
   "main": "./lib/inductive.js",
   "scripts": {
-    "test": "node ./test/test.js"
+    "test": "./test/test.i.js"
   },
   "repository": {
     "type": "git",

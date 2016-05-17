@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 'use strict'
 
 console.log('\x1B[2J') // clear screen
