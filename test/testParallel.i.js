@@ -32,7 +32,7 @@ var hypotenuseSquared = declare('hypotenuseSquared',
 var specs = [add, square, hypotenuse, hypotenuseSquared]
 specs.forEach(function(spec) {
   spec.specificationBuildingBlocks.forEach(function(dep) {
-    console.log(spec.name + ' depends on ' + dep.name)
+    console.log('# ' + spec.name + ' depends on ' + dep.name)
   })
 })
 
@@ -41,6 +41,7 @@ console.log()
 // Solve each spec
 specs.forEach(function(spec) {
   solve(spec)
+  console.log('# ' + spec.name + ' took ' + spec.solution.duration + 'ms')
 })
 
 // Emit code
