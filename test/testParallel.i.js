@@ -42,6 +42,7 @@ console.log()
 specs.forEach(function(spec) {
   solve(spec)
   console.log('# ' + spec.name + ' took ' + spec.solution.duration + 'ms')
+  console.log(spec.solution.rawAst)
 })
 
 // Emit code
