@@ -69,13 +69,14 @@ var inductive = require('../lib/inductive.js')
   , asArguments = inductive.asArguments
   , mapType = inductive.mapType
   , argumentsArrayType = inductive.argumentsArrayType
+  , verbosityLevels = inductive.verbosityLevels
 
 fileOptions.searchPath = null
 fileOptions.stopOnFailure = true
 fileOptions.termCheck = 10
 fileOptions.throwCacheErrors = true
 fileOptions.timeout = 0
-fileOptions.verbosity = 0
+fileOptions.verbosity = verbosityLevels.quiet
 fileOptions.testsToRun = null
 
 var farenheit = smallType('farenheit', Number)
