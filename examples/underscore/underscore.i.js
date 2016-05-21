@@ -126,7 +126,7 @@ var UnderscoreCtor = specifyConstructor('UnderscoreCtor',
   given([], shouldReturn({ _wrapped: [] })))
 
 var _ = specify('_',
-  setOptions({ verbosity: 10 }),
+  setOptions({ verbosity: verbosityLevels.expression }),
   takes(unionType(undefined, Array, argumentsArrayType)),
   returns(UnderscoreCtor),
   given(undefined,
@@ -143,7 +143,7 @@ var _ = specify('_',
 
 var _first = specify('_first',
 
-  setOptions({ verbosity: 5 }),
+  setOptions({ verbosity: verbosityLevels.candidate }),
 
   takesContext(UnderscoreCtor),
   takes(Number),
