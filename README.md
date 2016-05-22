@@ -129,10 +129,12 @@ We can now run the auto-generated program:
 Docs
 ====
 
-Docs are forthcoming.
+Complete docs are forthcoming.
 In the meantime, the `testSolves.i.js` file contains many examples.
 The `buildingBlocks.js` file contains the default list of building blocks
 that you can include with the `use` command.
+The [wiki](https://github.com/omphalos/inductive.js/wiki)
+contains some general info as well.
 
 License
 =======
